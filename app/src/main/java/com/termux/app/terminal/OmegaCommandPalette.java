@@ -51,6 +51,7 @@ public final class OmegaCommandPalette extends Dialog {
 
         TextView title = new TextView(context);
         title.setText("OMEGA COMMAND CENTER");
+        title.setContentDescription("OMEGA Command Center");
         title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         title.setTextSize(12);
         title.setLetterSpacing(0.08f);
@@ -60,6 +61,7 @@ public final class OmegaCommandPalette extends Dialog {
         search = new EditText(context);
         search.setSingleLine(true);
         search.setHint("Search commands…");
+        search.setContentDescription("Search OMEGA commands");
         search.setTextSize(16);
         search.setImeOptions(EditorInfo.IME_ACTION_DONE);
         search.setPadding(dp(12), 0, dp(12), 0);
@@ -67,6 +69,7 @@ public final class OmegaCommandPalette extends Dialog {
         root.addView(search, new LinearLayout.LayoutParams(-1, dp(48)));
 
         resultsScroll = new ScrollView(context);
+        resultsScroll.setContentDescription("OMEGA command results");
         results = new LinearLayout(context);
         results.setOrientation(LinearLayout.VERTICAL);
         resultsScroll.addView(results, new ScrollView.LayoutParams(-1, -2));
@@ -133,8 +136,9 @@ public final class OmegaCommandPalette extends Dialog {
 
     private void refresh() {
         String query = state.getQuery().trim().toLowerCase(Locale.ROOT);
+        int sessionCount = activity.getTermuxService() == null ? 0 : activity.getTermuxService().getTermuxSessionsSize();
         filtered = new ArrayList<>();
-        for (OmegaCommand command : OmegaCommandRegistry.defaultCommands()) {
+        for (OmegaCommand command : OmegaCommandRegistry.sessionAwareCommands(sessionCount)) {
             String haystack = (command.getId() + " " + command.getTitle() + " " + command.getCategory().name()).toLowerCase(Locale.ROOT);
             if (query.isEmpty() || haystack.contains(query)) filtered.add(command);
         }
@@ -144,9 +148,13 @@ public final class OmegaCommandPalette extends Dialog {
         for (int i = 0; i < filtered.size(); i++) {
             OmegaCommand command = filtered.get(i);
             TextView item = new TextView(getContext());
-            item.setText(command.getTitle() + (command.getShortcut() == null ? "" : "    " + command.getShortcut()));
+            String label = command.getTitle() + (command.getShortcut() == null ? "" : "    " + command.getShortcut());
+            item.setText(label);
+            item.setContentDescription(command.getTitle() + " command");
             item.setTextSize(15);
             item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setFocusable(true);
+            item.setClickable(true);
             item.setPadding(dp(12), 0, dp(12), 0);
             final int index = i;
             item.setOnClickListener(v -> {
@@ -161,10 +169,12 @@ public final class OmegaCommandPalette extends Dialog {
 
     private void refreshSelection() {
         for (int i = 0; i < results.getChildCount(); i++) {
-            results.getChildAt(i).setBackground(i == state.getSelectedIndex() ? roundBackground(0x663B82F6, 10) : null);
+            View child = results.getChildAt(i);
+            child.setSelected(i == state.getSelectedIndex());
+            child.setBackground(i == state.getSelectedIndex() ? roundBackground(0x663B82F6, 10) : null);
         }
         if (state.getSelectedIndex() < results.getChildCount()) {
-            results.getChildAt(state.getSelectedIndex()).requestFocusFromTouch();
+            results.getChildAt(state.getSelectedIndex()).requestFocus();
             resultsScroll.smoothScrollTo(0, state.getSelectedIndex() * dp(48));
         }
     }
