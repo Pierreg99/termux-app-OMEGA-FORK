@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 
 /** Persistent, OMEGA-only decoration state for the immutable command catalog. */
 public final class OmegaCommandPreferenceStore {
@@ -17,6 +16,8 @@ public final class OmegaCommandPreferenceStore {
     private static final String RECENTS = "recents";
     private static final String ORDER = "order";
     private static final String SHORTCUT_PREFIX = "shortcut_";
+    private static final String SESSION_SELECTOR_PREFIX = "Alt+";
+    private static final int MAX_SESSION_SELECTORS = 8;
 
     private final SharedPreferences preferences;
 
@@ -75,6 +76,11 @@ public final class OmegaCommandPreferenceStore {
             if (command.getId().equals(commandId)) continue;
             if (normalized.equalsIgnoreCase(command.getShortcut() == null ? "" : command.getShortcut())) return false;
             if (normalized.equalsIgnoreCase(getCustomShortcut(command.getId()))) return false;
+        }
+        // Alt+1..8 are reserved by the OMEGA dynamic session-selector layer,
+        // even when the current catalog has fewer than eight sessions.
+        for (int i = 1; i <= MAX_SESSION_SELECTORS; i++) {
+            if ((SESSION_SELECTOR_PREFIX + i).equalsIgnoreCase(normalized)) return false;
         }
         return true;
     }
