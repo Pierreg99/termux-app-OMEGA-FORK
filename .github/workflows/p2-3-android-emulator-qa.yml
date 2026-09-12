@@ -1,13 +1,11 @@
 name: OMEGA P2.3 Android Emulator QA
 
-on: [push, workflow_dispatch]
+on:
+  push:
+  workflow_dispatch:
 
 permissions:
   contents: read
-
-concurrency:
-  group: omega-p2-3-emulator-qa-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   android-emulator-qa:
