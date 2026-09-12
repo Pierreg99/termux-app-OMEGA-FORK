@@ -1,3 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- OMEGA Design System v1: semantic color tokens. -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="red_400">#EF5350</color>
+    <color name="grey_500">#9E9E9E</color>
+
+    <color name="omega_background">#070A0F</color>
+    <color name="omega_surface">#0E141D</color>
+    <color name="omega_surface_elevated">#151E2A</color>
+    <color name="omega_on_background">#F4F7FA</color>
+    <color name="omega_on_surface">#D9E2EC</color>
+    <color name="omega_primary">#63D7FF</color>
+    <color name="omega_primary_variant">#1EA7D8</color>
+    <color name="omega_accent">#A78BFA</color>
+    <color name="omega_success">#55D187</color>
+    <color name="omega_warning">#FFCA63</color>
+    <color name="omega_error">#FF6B6B</color>
+    <color name="omega_terminal_background">#05070A</color>
+    <color name="omega_terminal_foreground">#E6EDF3</color>
+    <color name="omega_terminal_cursor">#63D7FF</color>
+    <color name="omega_divider">#263241</color>
 </resources>
