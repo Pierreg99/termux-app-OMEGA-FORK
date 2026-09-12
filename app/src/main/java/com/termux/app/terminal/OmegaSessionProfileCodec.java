@@ -73,7 +73,7 @@ public final class OmegaSessionProfileCodec {
     }
 
     @NonNull
-    private static OmegaSessionProfile fromJson(@NonNull JSONObject object) {
+    private static OmegaSessionProfile fromJson(@NonNull JSONObject object) throws Exception {
         String id = object.getString("id");
         String displayName = object.getString("displayName");
         int fontSize = object.getInt("fontSize");
