@@ -72,14 +72,28 @@
                         android:contentDescription="Open OMEGA Command Center" />
                 </LinearLayout>
 
-                <com.termux.app.terminal.OmegaProfilePresetButton
-                    android:id="@+id/omega_profile_preset_button"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/omega_touch_target"
-                    android:layout_marginHorizontal="@dimen/omega_space_2"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/omega_space_2"
                     android:layout_marginTop="@dimen/omega_space_1"
-                    android:minWidth="0dp"
-                    android:contentDescription="Open OMEGA theme and profile presets" />
+                    android:orientation="horizontal">
+                    <com.termux.app.terminal.OmegaProfilePresetButton
+                        android:id="@+id/omega_profile_preset_button"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/omega_touch_target"
+                        android:layout_weight="1"
+                        android:minWidth="0dp"
+                        android:contentDescription="Open OMEGA theme and profile presets" />
+                    <com.termux.app.terminal.OmegaCommandPreferenceButton
+                        android:id="@+id/omega_command_preference_button"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/omega_touch_target"
+                        android:layout_marginStart="@dimen/omega_space_1"
+                        android:layout_weight="1"
+                        android:minWidth="0dp"
+                        android:contentDescription="Open OMEGA command preferences" />
+                </LinearLayout>
 
                 <ListView
                     android:id="@+id/terminal_sessions_list"
