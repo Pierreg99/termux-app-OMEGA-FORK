@@ -3,9 +3,6 @@ package com.termux.app.terminal;
 import android.app.AlertDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,15 +31,19 @@ public final class OmegaProfilePresetDialog {
             .create();
         dialog.setOnShowListener(d -> {
             android.widget.ListView list = dialog.getListView();
-            list.setOnItemClickListener((parent, view, position, id) -> {
+            list.setOnItemClickListener((parent, view, position, itemId) -> {
                 if (position < presets.size()) {
                     OmegaSessionProfile profile = presets.get(position);
                     store.save(profile);
                     toast(context, profile.getDisplayName() + " saved");
                     dialog.dismiss();
                 } else if (position == presets.size()) {
-                    String json = OmegaSessionProfileCodec.exportProfiles(presetsToExport(store, presets));
                     ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    if (clipboard == null) {
+                        toast(context, "Clipboard unavailable");
+                        return;
+                    }
+                    String json = OmegaSessionProfileCodec.exportProfiles(presetsToExport(store, presets));
                     clipboard.setPrimaryClip(android.content.ClipData.newPlainText("OMEGA profiles", json));
                     toast(context, "OMEGA profiles exported");
                     dialog.dismiss();
@@ -66,8 +67,8 @@ public final class OmegaProfilePresetDialog {
                         .setTitle("Reset OMEGA profiles?")
                         .setMessage("Saved OMEGA profiles will be removed and the default preset restored.")
                         .setNegativeButton("Cancel", null)
-                        .setPositiveButton("Reset", (ignored, which) -> {
-                            for (String id : store.profileIds()) store.delete(id);
+                        .setPositiveButton("Reset", (resetDialog, whichButton) -> {
+                            for (String profileId : store.profileIds()) store.delete(profileId);
                             store.save(OmegaThemePresets.defaultProfile());
                             toast(context, "OMEGA Default restored");
                         })
@@ -87,8 +88,8 @@ public final class OmegaProfilePresetDialog {
         @NonNull List<OmegaSessionProfile> builtIns) {
         java.util.ArrayList<OmegaSessionProfile> result = new java.util.ArrayList<>();
         for (OmegaSessionProfile preset : builtIns) result.add(preset);
-        for (String id : store.profileIds()) {
-            OmegaSessionProfile profile = store.load(id);
+        for (String profileId : store.profileIds()) {
+            OmegaSessionProfile profile = store.load(profileId);
             boolean duplicate = false;
             for (OmegaSessionProfile existing : result) {
                 if (existing.getId().equals(profile.getId())) { duplicate = true; break; }
