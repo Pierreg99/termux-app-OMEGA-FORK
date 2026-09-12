@@ -5,7 +5,6 @@ import android.view.Gravity;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.termux.R;
@@ -41,18 +40,7 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
         mTermuxTerminalViewClient = termuxTerminalViewClient;
         mTermuxTerminalSessionActivityClient = termuxTerminalSessionActivityClient;
 
-        applyOmegaVisualPolicy();
         setExtraKeys();
-    }
-
-    /** Apply OMEGA semantic colors without changing the existing properties-based key model. */
-    private void applyOmegaVisualPolicy() {
-        setButtonColors(
-            ContextCompat.getColor(mActivity, R.color.omega_on_surface),
-            ContextCompat.getColor(mActivity, R.color.omega_primary),
-            ContextCompat.getColor(mActivity, R.color.omega_surface),
-            ContextCompat.getColor(mActivity, R.color.omega_surface_elevated));
-        setButtonTextAllCaps(true);
     }
 
     /** Set the terminal extra keys and style. */
