@@ -38,20 +38,22 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 - [x] Connect session actions to existing Termux session APIs.
 - [x] Connect terminal actions to existing activity APIs.
 - [x] Add command-registry and UI tests.
+- [x] Add automated JVM regression gate to Android evidence workflow.
+- [x] Add UI-tree assertions, portrait/landscape captures and evidence manifest.
 - [ ] Execute Android emulator/device screenshot and accessibility evidence gate.
 - [ ] Complete hardware-keyboard smoke validation.
 
 **P2 specification:** `docs/OMEGA-COMMAND-CENTER-P2.md`
 
-## Phase 4 — Power-User Features — P3 READY
+## Phase 4 — Power-User Features — P3 IN PROGRESS
 
-- [ ] Per-session profiles.
-- [ ] Theme/profile presets with import/export.
+- [x] Per-session profile model and isolated persistence store.
+- [x] Theme/profile preset serialization with versioned JSON import/export.
 - [ ] Font, cursor, scrollback, opacity/transparency and extra-key controls.
 - [ ] Optional session restore under explicit user control.
 - [ ] Command favorites/pinning and user-defined ordering.
 - [ ] Configurable command shortcuts without changing existing Termux defaults.
-- [ ] Preserve existing Termux plugin integration points.
+- [x] Preserve existing Termux plugin integration points.
 
 **P3 specification:** `docs/OMEGA-POWER-USER-P3.md`
 
@@ -83,4 +85,4 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 
 ## Tracking
 
-**Current state:** P0 and P1 are complete at source/documentation level. P2.1 and P2.2 are implemented. P2.3 runtime validation is active with GitHub Actions emulator coverage, but real accessibility/hardware-keyboard evidence remains a release gate. P3 architecture is now ready for implementation without blocking the P2.3 evidence lane.
+**Current state:** P0/P1 are complete. P2.1/P2.2 are implemented. P2.3 now has an automated JVM + emulator-evidence lane with UI-tree assertions, portrait/landscape screenshots and a machine-readable evidence manifest; real accessibility/hardware-keyboard validation remains a release gate. P3.1 is implemented and P3.2 serialization/storage is implemented; the remaining P3.2 work is UI integration for preset selection and import/export controls.
