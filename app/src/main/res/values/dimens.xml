@@ -9,6 +9,7 @@
     <dimen name="omega_space_6">32dp</dimen>
 
     <dimen name="omega_touch_target">48dp</dimen>
+    <dimen name="omega_toolbar_height">40dp</dimen>
     <dimen name="omega_corner_small">6dp</dimen>
     <dimen name="omega_corner_medium">10dp</dimen>
     <dimen name="omega_corner_large">16dp</dimen>
