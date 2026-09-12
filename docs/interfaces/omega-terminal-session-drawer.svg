@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="t d">
+<title id="t">OMEGA Terminal Session Drawer</title><desc id="d">Dark terminal interface with an OMEGA session drawer, active session and actions.</desc>
+<rect width="1200" height="760" fill="#05070A"/>
+<rect x="0" y="0" width="360" height="760" fill="#0E141D"/>
+<text x="28" y="46" fill="#F4F7FA" font-family="sans-serif" font-size="25" font-weight="700">OMEGA SESSIONS</text>
+<rect x="20" y="72" width="320" height="92" rx="10" fill="#151E2A" stroke="#63D7FF" stroke-width="2"/>
+<circle cx="45" cy="101" r="7" fill="#55D187"/>
+<text x="65" y="108" fill="#F4F7FA" font-family="sans-serif" font-size="18" font-weight="700">main · bash</text>
+<text x="65" y="134" fill="#9EACBA" font-family="sans-serif" font-size="14">PID 1842 · active</text>
+<rect x="20" y="178" width="320" height="76" rx="10" fill="#0E141D" stroke="#263241"/>
+<circle cx="45" cy="206" r="7" fill="#FFCA63"/>
+<text x="65" y="212" fill="#D9E2EC" font-family="sans-serif" font-size="18">dev · zsh</text>
+<text x="65" y="236" fill="#8996A4" font-family="sans-serif" font-size="14">PID 1928 · background</text>
+<rect x="20" y="268" width="320" height="76" rx="10" fill="#0E141D" stroke="#263241"/>
+<circle cx="45" cy="296" r="7" fill="#8996A4"/>
+<text x="65" y="302" fill="#D9E2EC" font-family="sans-serif" font-size="18">logs · bash</text>
+<text x="65" y="326" fill="#8996A4" font-family="sans-serif" font-size="14">PID 2011 · background</text>
+<rect x="20" y="665" width="154" height="58" rx="10" fill="#151E2A"/>
+<text x="49" y="700" fill="#63D7FF" font-family="sans-serif" font-size="16" font-weight="700">KEYBOARD</text>
+<rect x="186" y="665" width="154" height="58" rx="10" fill="#151E2A"/>
+<text x="226" y="700" fill="#63D7FF" font-family="sans-serif" font-size="16" font-weight="700">+ NEW</text>
+<text x="395" y="55" fill="#63D7FF" font-family="monospace" font-size="15">OMEGA TERMINAL UX / P1</text>
+<text x="395" y="100" fill="#E6EDF3" font-family="monospace" font-size="17">$ neofetch --minimal</text>
+<text x="395" y="128" fill="#A7B4C2" font-family="monospace" font-size="15">OS: Android · Shell: bash · Session: main</text>
+<text x="395" y="170" fill="#55D187" font-family="monospace" font-size="17">Ready.</text>
+<rect x="390" y="687" width="790" height="1" fill="#263241"/>
+<text x="395" y="716" fill="#8996A4" font-family="monospace" font-size="14">drawer · sessions · keyboard · settings</text>
+</svg>
