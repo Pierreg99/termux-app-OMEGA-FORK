@@ -45,14 +45,21 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 
 **P2 specification:** `docs/OMEGA-COMMAND-CENTER-P2.md`
 
-## Phase 4 — Power-User Features — P3 IN PROGRESS
+## Phase 4 — Power-User Features — P3 BASELINE IMPLEMENTED
 
 - [x] Per-session profile model and isolated persistence store.
-- [x] Theme/profile preset serialization with versioned JSON import/export.
-- [ ] Font, cursor, scrollback, opacity/transparency and extra-key controls.
+- [x] Built-in OMEGA theme/profile presets.
+- [x] Versioned JSON import/export and validation.
+- [x] P3.2 preset manager UI in the session drawer.
+- [x] Persistent command favorites/pinning.
+- [x] Persistent command ordering data.
+- [x] Bounded recent-command recording.
+- [x] Configurable OMEGA-only shortcut overrides.
+- [x] Shortcut conflict detection.
+- [x] P3.3 command preferences UI in the session drawer.
+- [ ] Apply profiles directly to live session presentation state.
 - [ ] Optional session restore under explicit user control.
-- [ ] Command favorites/pinning and user-defined ordering.
-- [ ] Configurable command shortcuts without changing existing Termux defaults.
+- [ ] Font, cursor, scrollback, opacity/transparency and extra-key controls.
 - [x] Preserve existing Termux plugin integration points.
 
 **P3 specification:** `docs/OMEGA-POWER-USER-P3.md`
@@ -85,4 +92,4 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 
 ## Tracking
 
-**Current state:** P0/P1 are complete. P2.1/P2.2 are implemented. P2.3 now has an automated JVM + emulator-evidence lane with UI-tree assertions, portrait/landscape screenshots and a machine-readable evidence manifest; real accessibility/hardware-keyboard validation remains a release gate. P3.1 is implemented and P3.2 serialization/storage is implemented; the remaining P3.2 work is UI integration for preset selection and import/export controls.
+**Current state:** P0/P1 complete. P2.1/P2.2 implemented; P2.3 evidence is still blocked by the current GitHub Actions execution issue, so no runtime/accessibility pass is claimed. P3.1–P3.3 baseline layers are now UI-integrated and isolated from the terminal engine. Next product work is P3.4 explicit session restore; next validation work is repairing the P2.3 Actions execution path.
