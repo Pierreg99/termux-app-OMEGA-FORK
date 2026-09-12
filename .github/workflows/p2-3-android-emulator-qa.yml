@@ -22,9 +22,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          cache: gradle
 
-      - name: Build debug APK
-        run: ./gradlew :app:assembleDebug
+      - name: JVM regression tests and debug build
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --stacktrace
 
       - name: Start Android emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -36,12 +37,15 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim
           disable-animations: true
           script: |
+            set -euo pipefail
             adb devices
+            adb wait-for-device
             adb shell settings put system screen_brightness 128
             adb shell settings put system screen_off_timeout 1800000
             APK=$(find app/build/outputs/apk -type f -name '*debug*.apk' | head -n 1)
             test -n "$APK"
             adb install -r "$APK"
+            adb shell pm path com.termux | grep -q 'package:'
             adb shell am force-stop com.termux
             adb shell monkey -p com.termux 1
             sleep 8
@@ -51,7 +55,7 @@ jobs:
             adb shell input swipe 20 900 700 900 500
             sleep 2
             adb shell uiautomator dump /sdcard/omega-ui.xml >/dev/null
-            adb shell cat /sdcard/omega-ui.xml > qa/screenshots/p2.3/ui-dump.xml
+            adb shell cat /sdcard/omega-ui.xml > qa/screenshots/p2.3/ui-dump-drawer.xml
             bounds=$(adb shell cat /sdcard/omega-ui.xml | grep -o 'text="COMMANDS"[^>]*bounds="\[[0-9,]*\]\[[0-9,]*\]"' | head -n 1 | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]"/\1 \2 \3 \4/p')
             test -n "$bounds"
             set -- $bounds
@@ -59,11 +63,20 @@ jobs:
             y=$((($2 + $4) / 2))
             adb shell input tap "$x" "$y"
             sleep 2
+            adb shell uiautomator dump /sdcard/omega-palette.xml >/dev/null
+            adb shell cat /sdcard/omega-palette.xml > qa/screenshots/p2.3/ui-dump-palette.xml
+            grep -q 'OMEGA COMMAND CENTER' qa/screenshots/p2.3/ui-dump-palette.xml
+            grep -q 'Search OMEGA commands' qa/screenshots/p2.3/ui-dump-palette.xml
             adb exec-out screencap -p > qa/screenshots/p2.3/command-center-portrait.png
 
-            # Verify search field path and capture filtered session commands.
+            # Verify search filtering and capture filtered session commands.
+            adb shell input tap 360 180 || true
+            adb shell input keyevent KEYCODE_MOVE_END || true
             adb shell input text session
             sleep 1
+            adb shell uiautomator dump /sdcard/omega-session.xml >/dev/null
+            adb shell cat /sdcard/omega-session.xml > qa/screenshots/p2.3/ui-dump-session-search.xml
+            grep -qi 'session' qa/screenshots/p2.3/ui-dump-session-search.xml
             adb exec-out screencap -p > qa/screenshots/p2.3/session-search.png
 
             # Rotate and capture the same command palette state.
@@ -81,19 +94,51 @@ Android: $(adb shell getprop ro.build.version.release | tr -d '\r')
 API: $(adb shell getprop ro.build.version.sdk | tr -d '\r')
 Density: $(adb shell wm density | tr -d '\r' | head -n 1)
 Model: $(adb shell getprop ro.product.model | tr -d '\r')
+PackagePath: $(adb shell pm path com.termux | tr -d '\r')
 CapturedAtUTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)
 EOF
 
-      - name: Upload Android screenshot evidence
+            python3 - <<'PY'
+            from pathlib import Path
+            import struct
+
+            root = Path('qa/screenshots/p2.3')
+            def png_size(path):
+                data = path.read_bytes()
+                if data[:8] != b'\x89PNG\r\n\x1a\n':
+                    raise SystemExit(f'Not a PNG: {path}')
+                width, height = struct.unpack('>II', data[16:24])
+                return width, height
+
+            portrait = png_size(root / 'command-center-portrait.png')
+            landscape = png_size(root / 'command-center-landscape.png')
+            search = png_size(root / 'session-search.png')
+            if portrait[0] <= 0 or portrait[1] <= 0 or search[0] <= 0 or search[1] <= 0:
+                raise SystemExit('Invalid screenshot dimensions')
+            if portrait == landscape:
+                raise SystemExit('Landscape evidence did not change dimensions')
+            (root / 'EVIDENCE.txt').write_text(
+                'P2.3 emulator evidence checks passed\n'
+                f'portrait={portrait[0]}x{portrait[1]}\n'
+                f'landscape={landscape[0]}x{landscape[1]}\n'
+                f'session_search={search[0]}x{search[1]}\n'
+                'ui_command_center=true\n'
+                'ui_search_field=true\n'
+                'ui_session_filter=true\n',
+                encoding='utf-8')
+            PY
+
+      - name: Upload Android screenshot and UI evidence
         uses: actions/upload-artifact@v5
         with:
-          name: omega-p2.3-android-screenshots
+          name: omega-p2.3-android-evidence
           path: |
             qa/screenshots/p2.3/*.png
-            qa/screenshots/p2.3/DEVICE.txt
+            qa/screenshots/p2.3/*.xml
+            qa/screenshots/p2.3/*.txt
           if-no-files-found: error
 
-      - name: Upload runtime metadata
+      - name: Upload runtime metadata and APK
         uses: actions/upload-artifact@v5
         with:
           name: omega-p2.3-runtime-metadata
