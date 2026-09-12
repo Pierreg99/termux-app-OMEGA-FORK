@@ -5,8 +5,10 @@ import android.view.Gravity;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.termux.R;
 import com.termux.app.TermuxActivity;
 import com.termux.app.terminal.TermuxTerminalSessionActivityClient;
 import com.termux.app.terminal.TermuxTerminalViewClient;
@@ -39,20 +41,25 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
         mTermuxTerminalViewClient = termuxTerminalViewClient;
         mTermuxTerminalSessionActivityClient = termuxTerminalSessionActivityClient;
 
+        applyOmegaVisualPolicy();
         setExtraKeys();
     }
 
+    /** Apply OMEGA semantic colors without changing the existing properties-based key model. */
+    private void applyOmegaVisualPolicy() {
+        setButtonColors(
+            ContextCompat.getColor(mActivity, R.color.omega_on_surface),
+            ContextCompat.getColor(mActivity, R.color.omega_primary),
+            ContextCompat.getColor(mActivity, R.color.omega_surface),
+            ContextCompat.getColor(mActivity, R.color.omega_surface_elevated));
+        setButtonTextAllCaps(true);
+    }
 
-    /**
-     * Set the terminal extra keys and style.
-     */
+    /** Set the terminal extra keys and style. */
     private void setExtraKeys() {
         mExtraKeysInfo = null;
 
         try {
-            // The mMap stores the extra key and style string values while loading properties
-            // Check {@link #getExtraKeysInternalPropertyValueFromValue(String)} and
-            // {@link #getExtraKeysStyleInternalPropertyValueFromValue(String)}
             String extrakeys = (String) mActivity.getProperties().getInternalPropertyValue(TermuxPropertyConstants.KEY_EXTRA_KEYS, true);
             String extraKeysStyle = (String) mActivity.getProperties().getInternalPropertyValue(TermuxPropertyConstants.KEY_EXTRA_KEYS_STYLE, true);
 
@@ -70,7 +77,7 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
             try {
                 mExtraKeysInfo = new ExtraKeysInfo(TermuxPropertyConstants.DEFAULT_IVALUE_EXTRA_KEYS, TermuxPropertyConstants.DEFAULT_IVALUE_EXTRA_KEYS_STYLE, ExtraKeysConstants.CONTROL_CHARS_ALIASES);
             } catch (JSONException e2) {
-                Logger.showToast(mActivity, "Can't create default extra keys",true);
+                Logger.showToast(mActivity, "Can't create default extra keys", true);
                 Logger.logStackTraceWithMessage(LOG_TAG, "Could create default extra keys: ", e);
                 mExtraKeysInfo = null;
             }
@@ -85,7 +92,7 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
     @Override
     public void onTerminalExtraKeyButtonClick(View view, String key, boolean ctrlDown, boolean altDown, boolean shiftDown, boolean fnDown) {
         if ("KEYBOARD".equals(key)) {
-            if(mTermuxTerminalViewClient != null)
+            if (mTermuxTerminalViewClient != null)
                 mTermuxTerminalViewClient.onToggleSoftKeyboardRequest();
         } else if ("DRAWER".equals(key)) {
             DrawerLayout drawerLayout = mTermuxTerminalViewClient.getActivity().getDrawer();
@@ -94,9 +101,9 @@ public class TermuxTerminalExtraKeys extends TerminalExtraKeys {
             else
                 drawerLayout.openDrawer(Gravity.LEFT);
         } else if ("PASTE".equals(key)) {
-            if(mTermuxTerminalSessionActivityClient != null)
+            if (mTermuxTerminalSessionActivityClient != null)
                 mTermuxTerminalSessionActivityClient.onPasteTextFromClipboard(null);
-        }  else if ("SCROLL".equals(key)) {
+        } else if ("SCROLL".equals(key)) {
             TerminalView terminalView = mTermuxTerminalViewClient.getActivity().getTerminalView();
             if (terminalView != null && terminalView.mEmulator != null)
                 terminalView.mEmulator.toggleAutoScrollDisabled();
