@@ -4,12 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.google.android.material.button.MaterialButton;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
@@ -66,7 +68,7 @@ public class OmegaCommandPaletteTest {
 
     @Test
     public void paletteLauncherHasAccessibleLabel() {
-        Context context = RuntimeEnvironment.getApplication();
+        Context context = Robolectric.buildActivity(Activity.class).setup().get();
         MaterialButton button = new OmegaCommandPaletteButton(context);
         assertEquals("COMMANDS", button.getText().toString());
         assertEquals("Open OMEGA Command Center", button.getContentDescription());
