@@ -1,9 +1,30 @@
-<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/session_title"
-    android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:background="@drawable/session_background_selected"
-    android:ellipsize="marquee"
-    android:gravity="start|center_vertical"
-    android:padding="6dip"
-    android:textSize="14sp" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="72dp"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/omega_space_3"
+    android:paddingEnd="@dimen/omega_space_3"
+    android:paddingTop="@dimen/omega_space_2"
+    android:paddingBottom="@dimen/omega_space_2"
+    android:background="@drawable/session_background_selected">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/session_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/session_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/omega_space_1"
+        android:maxLines="1"
+        android:textSize="11sp"
+        android:letterSpacing="0.08" />
+
+</LinearLayout>
