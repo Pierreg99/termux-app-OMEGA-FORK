@@ -46,23 +46,56 @@ jobs:
             adb shell monkey -p com.termux 1
             sleep 8
             mkdir -p qa/screenshots/p2.3
+
+            # Open the session drawer and locate the OMEGA COMMANDS launcher by text.
+            adb shell input swipe 20 900 700 900 500
+            sleep 2
+            adb shell uiautomator dump /sdcard/omega-ui.xml >/dev/null
+            adb shell cat /sdcard/omega-ui.xml > qa/screenshots/p2.3/ui-dump.xml
+            bounds=$(adb shell cat /sdcard/omega-ui.xml | grep -o 'text="COMMANDS"[^>]*bounds="\[[0-9,]*\]\[[0-9,]*\]"' | head -n 1 | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]"/\1 \2 \3 \4/p')
+            test -n "$bounds"
+            set -- $bounds
+            x=$((($1 + $3) / 2))
+            y=$((($2 + $4) / 2))
+            adb shell input tap "$x" "$y"
+            sleep 2
             adb exec-out screencap -p > qa/screenshots/p2.3/command-center-portrait.png
+
+            # Verify search field path and capture filtered session commands.
+            adb shell input text session
+            sleep 1
+            adb exec-out screencap -p > qa/screenshots/p2.3/session-search.png
+
+            # Rotate and capture the same command palette state.
+            adb shell settings put system accelerometer_rotation 0 || true
             adb shell settings put system user_rotation 1 || true
             sleep 2
             adb exec-out screencap -p > qa/screenshots/p2.3/command-center-landscape.png
+
+            adb shell settings put system user_rotation 0 || true
+            sleep 1
+
+            cat > qa/screenshots/p2.3/DEVICE.txt <<EOF
+Serial: $(adb get-serialno | tr -d '\r')
+Android: $(adb shell getprop ro.build.version.release | tr -d '\r')
+API: $(adb shell getprop ro.build.version.sdk | tr -d '\r')
+Density: $(adb shell wm density | tr -d '\r' | head -n 1)
+Model: $(adb shell getprop ro.product.model | tr -d '\r')
+CapturedAtUTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+EOF
 
       - name: Upload Android screenshot evidence
         uses: actions/upload-artifact@v5
         with:
           name: omega-p2.3-android-screenshots
-          path: qa/screenshots/p2.3/*.png
+          path: |
+            qa/screenshots/p2.3/*.png
+            qa/screenshots/p2.3/DEVICE.txt
           if-no-files-found: error
 
       - name: Upload runtime metadata
         uses: actions/upload-artifact@v5
         with:
           name: omega-p2.3-runtime-metadata
-          path: |
-            app/build/outputs/apk/**/*.apk
-            qa/P2.3-ANDROID-QA-RESULTS.md
+          path: app/build/outputs/apk/**/*.apk
           if-no-files-found: warn
