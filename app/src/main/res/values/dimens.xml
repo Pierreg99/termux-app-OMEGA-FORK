@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- OMEGA Design System v1 spacing and shape tokens. -->
     <dimen name="omega_space_1">4dp</dimen>
@@ -9,8 +8,9 @@
     <dimen name="omega_space_6">32dp</dimen>
 
     <dimen name="omega_touch_target">48dp</dimen>
-    <dimen name="omega_toolbar_height">40dp</dimen>
     <dimen name="omega_corner_small">6dp</dimen>
     <dimen name="omega_corner_medium">10dp</dimen>
     <dimen name="omega_corner_large">16dp</dimen>
+    <dimen name="omega_toolbar_height">40dp</dimen>
+    <dimen name="omega_inset_spacer_base">1dp</dimen>
 </resources>
