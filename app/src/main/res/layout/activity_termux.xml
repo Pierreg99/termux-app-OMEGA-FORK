@@ -62,6 +62,14 @@
                         android:background="@null"
                         android:contentDescription="@string/action_open_settings"
                         app:tint="?attr/termuxActivityDrawerImageTint" />
+                    <com.termux.app.terminal.OmegaCommandPaletteButton
+                        android:id="@+id/omega_command_palette_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/omega_touch_target"
+                        android:layout_marginStart="@dimen/omega_space_1"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="@dimen/omega_space_2"
+                        android:contentDescription="Open OMEGA Command Center" />
                 </LinearLayout>
 
                 <ListView
