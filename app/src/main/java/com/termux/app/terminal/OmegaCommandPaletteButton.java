@@ -27,6 +27,7 @@ public final class OmegaCommandPaletteButton extends MaterialButton {
     private void init() {
         setText("COMMANDS");
         setAllCaps(false);
+        setContentDescription("Open OMEGA Command Center");
         setOnClickListener(v -> new OmegaCommandPalette(getContext()).show());
     }
 }
