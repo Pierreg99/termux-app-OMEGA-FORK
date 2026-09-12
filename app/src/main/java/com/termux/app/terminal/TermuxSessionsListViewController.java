@@ -1,7 +1,6 @@
 package com.termux.app.terminal;
 
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.SpannableString;
@@ -21,8 +20,6 @@ import androidx.core.content.ContextCompat;
 import com.termux.R;
 import com.termux.app.TermuxActivity;
 import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
-import com.termux.shared.theme.NightMode;
-import com.termux.shared.theme.ThemeUtils;
 import com.termux.terminal.TerminalSession;
 
 import java.util.List;
@@ -39,7 +36,7 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
         this.mActivity = activity;
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -50,58 +47,76 @@ public class TermuxSessionsListViewController extends ArrayAdapter<TermuxSession
         }
 
         TextView sessionTitleView = sessionRowView.findViewById(R.id.session_title);
+        TextView sessionStateView = sessionRowView.findViewById(R.id.session_state);
 
-        TerminalSession sessionAtRow = getItem(position).getTerminalSession();
+        TermuxSession termuxSession = getItem(position);
+        TerminalSession sessionAtRow = termuxSession != null ? termuxSession.getTerminalSession() : null;
         if (sessionAtRow == null) {
             sessionTitleView.setText("null session");
+            sessionStateView.setText(OmegaSessionState.EXITED.getLabel());
             return sessionRowView;
-        }
-
-        boolean shouldEnableDarkTheme = ThemeUtils.shouldEnableDarkTheme(mActivity, NightMode.getAppNightMode().getName());
-
-        if (shouldEnableDarkTheme) {
-            sessionTitleView.setBackground(
-                ContextCompat.getDrawable(mActivity, R.drawable.session_background_black_selected)
-            );
         }
 
         String name = sessionAtRow.mSessionName;
         String sessionTitle = sessionAtRow.getTitle();
 
         String numberPart = "[" + (position + 1) + "] ";
-        String sessionNamePart = (TextUtils.isEmpty(name) ? "" : name);
-        String sessionTitlePart = (TextUtils.isEmpty(sessionTitle) ? "" : ((sessionNamePart.isEmpty() ? "" : "\n") + sessionTitle));
+        String sessionNamePart = TextUtils.isEmpty(name) ? "" : name;
+        String sessionTitlePart = TextUtils.isEmpty(sessionTitle)
+            ? ""
+            : ((sessionNamePart.isEmpty() ? "" : "\n") + sessionTitle);
 
         String fullSessionTitle = numberPart + sessionNamePart + sessionTitlePart;
         SpannableString fullSessionTitleStyled = new SpannableString(fullSessionTitle);
         fullSessionTitleStyled.setSpan(boldSpan, 0, numberPart.length() + sessionNamePart.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        fullSessionTitleStyled.setSpan(italicSpan, numberPart.length() + sessionNamePart.length(), fullSessionTitle.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+        if (numberPart.length() + sessionNamePart.length() < fullSessionTitle.length()) {
+            fullSessionTitleStyled.setSpan(italicSpan, numberPart.length() + sessionNamePart.length(), fullSessionTitle.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
         sessionTitleView.setText(fullSessionTitleStyled);
+        sessionTitleView.setPaintFlags(sessionTitleView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
 
         boolean sessionRunning = sessionAtRow.isRunning();
+        boolean isCurrent = mActivity.getCurrentSession() == sessionAtRow;
+        OmegaSessionState state = OmegaSessionState.resolve(isCurrent, sessionRunning, sessionAtRow.getExitStatus());
+        sessionStateView.setText(state.getLabel());
 
-        if (sessionRunning) {
-            sessionTitleView.setPaintFlags(sessionTitleView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-        } else {
-            sessionTitleView.setPaintFlags(sessionTitleView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        int stateColor;
+        switch (state) {
+            case ACTIVE:
+                stateColor = ContextCompat.getColor(mActivity, R.color.omega_success);
+                break;
+            case BACKGROUND:
+                stateColor = ContextCompat.getColor(mActivity, R.color.omega_warning);
+                break;
+            case EXITED:
+            default:
+                stateColor = sessionAtRow.getExitStatus() == 0
+                    ? ContextCompat.getColor(mActivity, R.color.omega_on_surface)
+                    : ContextCompat.getColor(mActivity, R.color.omega_error);
+                sessionTitleView.setPaintFlags(sessionTitleView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                break;
         }
-        int defaultColor = shouldEnableDarkTheme ? Color.WHITE : Color.BLACK;
-        int color = sessionRunning || sessionAtRow.getExitStatus() == 0 ? defaultColor : Color.RED;
-        sessionTitleView.setTextColor(color);
+
+        sessionStateView.setTextColor(stateColor);
+        sessionTitleView.setTextColor(ContextCompat.getColor(mActivity, R.color.omega_on_background));
+        sessionRowView.setContentDescription(fullSessionTitle + ", " + state.getLabel());
+
         return sessionRowView;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         TermuxSession clickedSession = getItem(position);
+        if (clickedSession == null) return;
         mActivity.getTermuxTerminalSessionClient().setCurrentSession(clickedSession.getTerminalSession());
         mActivity.getDrawer().closeDrawers();
+        notifyDataSetChanged();
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         final TermuxSession selectedSession = getItem(position);
+        if (selectedSession == null) return true;
         mActivity.getTermuxTerminalSessionClient().renameSession(selectedSession.getTerminalSession());
         return true;
     }
