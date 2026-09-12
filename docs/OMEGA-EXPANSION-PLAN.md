@@ -10,23 +10,18 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 
 The repository currently uses the `master` branch and retains the legacy Termux app architecture, including `TermuxActivity`, `RunCommandService`, terminal-view and termux-shared modules. The Android app configuration is still based on a legacy `0.118.x` baseline with Java 8 source/target settings and Material Components already available. These are migration constraints, not a reason for a full rewrite.
 
-## Phase 0 — Architecture & Baseline Audit
+## Phase 1 — OMEGA Design System — IN PROGRESS / BASELINE IMPLEMENTED
 
-- Map app, terminal-view, termux-shared, native/bootstrap, resources and test surfaces.
-- Record Android SDK/NDK, Gradle, dependency and Java compatibility constraints.
-- Identify deprecated APIs, lifecycle risks, UI bottlenecks and upstream-coupled areas.
-- Establish an Android/API/ABI compatibility matrix.
-- Isolate OMEGA-specific code so upstream synchronization remains practical.
+- [x] Establish a dedicated OMEGA visual language for the Android terminal UI.
+- [x] Centralize initial color, spacing, shape and interaction-size tokens.
+- [x] Implement dark-first OMEGA surfaces and terminal-safe semantic colors.
+- [x] Wire primary, background, drawer, extra-key and accent styling through semantic resources.
+- [x] Add shared component-style foundations and document the token contract.
+- [ ] Modernize toolbar, session controls, dialogs and preferences using the token layer.
+- [ ] Add light/high-contrast and dynamic-color variants where practical.
+- [ ] Complete accessibility validation and larger-text checks.
 
-## Phase 1 — OMEGA Design System
-
-- Establish a dedicated OMEGA visual language for the Android terminal UI.
-- Centralize color, typography, spacing, elevation, icon and state tokens.
-- Implement dark-first OMEGA surfaces with optional light and high-contrast modes.
-- Modernize toolbar, drawer, session controls, dialogs and preferences.
-- Keep terminal rendering highly readable; contrast and cursor visibility take priority over decoration.
-- Support dynamic color where practical while retaining explicit OMEGA themes.
-- Add accessibility states, larger-text handling and appropriate touch targets.
+**Current implementation:** `app/src/main/res/values/colors.xml`, `dimens.xml`, `themes.xml`, `styles.xml`, and `docs/OMEGA-DESIGN-SYSTEM.md`.
 
 ## Phase 2 — Terminal UX Upgrade
 
@@ -124,4 +119,4 @@ The repository currently uses the `master` branch and retains the legacy Termux 
 
 ## Tracking
 
-This document is the master tracking specification for the OMEGA fork's design, UX and platform-upgrade program. Each phase should become a focused implementation change or follow-up tracking item as work progresses.
+This document is the master tracking specification for the OMEGA fork's design, UX and platform-upgrade program. Phase 1 has a working baseline; the next implementation target is terminal/session UX using the new semantic token layer.
