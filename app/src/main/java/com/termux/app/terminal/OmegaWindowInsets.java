@@ -1,6 +1,7 @@
 package com.termux.app.terminal;
 
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -17,10 +18,6 @@ public final class OmegaWindowInsets {
         return Math.max(systemBars, ime);
     }
 
-    /**
-     * Applies only the additional bottom inset to an existing bottom spacer.
-     * The spacer remains transparent and outside terminal rendering.
-     */
     public static void installBottomSpacerPolicy(final View spacer, final int baseHeightPx) {
         if (spacer == null) return;
         ViewCompat.setOnApplyWindowInsetsListener(spacer, (view, insets) -> {
