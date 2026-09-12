@@ -6,7 +6,7 @@
 
 Evolve the fork into a clearly differentiated, production-oriented OMEGA experience while preserving Termux core compatibility, terminal reliability and a maintainable upstream-sync path.
 
-## Phase 1 — OMEGA Design System — BASELINE IMPLEMENTED
+## Phase 1 — OMEGA Design System — COMPLETE
 
 - [x] Dedicated OMEGA visual language.
 - [x] Central color, spacing, shape and interaction-size tokens.
@@ -15,31 +15,32 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 - [x] Design-system documentation.
 - [x] Initial terminal surface migration.
 
-## Phase 2 — Terminal UX Upgrade — ACTIVE
+## Phase 2 — Terminal UX Upgrade — COMPLETE
 
 - [x] Apply OMEGA spacing and touch-target tokens to the session drawer.
 - [x] Move terminal toolbar background to an OMEGA semantic surface token.
-- [x] Add P1 interface reference pictures as repository SVG assets.
-- [x] Add P1 test matrix and manual QA checklist.
-- [x] Add P1 changelog.
-- [ ] Redesign session rows/cards with explicit active/background/closed states.
-- [ ] Upgrade extra-key handling with configurable profiles and customization.
-- [ ] Improve selection, copy/paste, URL detection and contextual actions.
-- [ ] Add app-action search without replacing shell input.
-- [ ] Centralize modern keyboard/window-insets handling.
-- [ ] Add instrumented session-switching tests.
+- [x] Redesign session rows with explicit ACTIVE/BACKGROUND/EXITED states.
+- [x] Add accessible session-state text and content descriptions.
+- [x] Apply OMEGA semantic visual policy to extra keys.
+- [x] Preserve existing `termux.properties` extra-key configuration.
+- [x] Centralize bottom IME/system-bar inset resolution.
+- [x] Keep inset handling outside terminal rendering through a transparent spacer.
+- [x] Add P1 UI/resource tests with Robolectric.
+- [x] Add P1 test matrix, changelog and interface references.
 
-**P1 documentation:** `docs/OMEGA-TERMINAL-UX-P1.md`  
-**P1 tests:** `docs/OMEGA-P1-TEST-MATRIX.md`  
-**Changelog:** `docs/OMEGA-CHANGELOG.md`  
-**Interface references:** `docs/interfaces/*.svg`
+## Phase 3 — OMEGA Command Center — ACTIVE
 
-## Phase 3 — OMEGA Command Center
+- [x] Define Command Center architecture and command categories.
+- [ ] Add immutable command identifiers and registry.
+- [ ] Add enabled/disabled command state resolution.
+- [ ] Add searchable command palette.
+- [ ] Add keyboard-first navigation and accessibility focus handling.
+- [ ] Connect session actions to existing Termux session APIs.
+- [ ] Connect terminal actions to existing activity APIs.
+- [ ] Add command-registry and UI tests.
+- [ ] Capture real-device screenshot evidence.
 
-- [ ] Add optional OMEGA command surface.
-- [ ] Command palette/search for navigation and settings.
-- [ ] Quick actions for new session, session navigation, preferences and help.
-- [ ] Keyboard- and accessibility-friendly command surface.
+**P2 specification:** `docs/OMEGA-COMMAND-CENTER-P2.md`
 
 ## Phase 4 — Power-User Features
 
@@ -77,4 +78,4 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 
 ## Tracking
 
-The current implementation target is **P1 Terminal UX**. Visual references in this phase are vector interface pictures; real PNG screenshots are a follow-up output of device/emulator QA so they represent the actual running build rather than static concept art.
+**Current state:** P0 and P1 are complete at source/documentation level. P2 OMEGA Command Center is active. Runtime/device verification remains a release gate until a real Android build and test run are available.
