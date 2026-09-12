@@ -77,8 +77,9 @@ public final class OmegaCommandPreferenceStore {
             if (normalized.equalsIgnoreCase(command.getShortcut() == null ? "" : command.getShortcut())) return false;
             if (normalized.equalsIgnoreCase(getCustomShortcut(command.getId()))) return false;
         }
-        // Alt+1..8 are reserved by the OMEGA dynamic session-selector layer,
-        // even when the current catalog has fewer than eight sessions.
+        // Reserve both the literal keyboard contract (Alt+N) and the concrete
+        // Alt+1..8 selector bindings used by the dynamic session-selector layer.
+        if ("Alt+N".equalsIgnoreCase(normalized)) return false;
         for (int i = 1; i <= MAX_SESSION_SELECTORS; i++) {
             if ((SESSION_SELECTOR_PREFIX + i).equalsIgnoreCase(normalized)) return false;
         }
