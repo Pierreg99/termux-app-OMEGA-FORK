@@ -1,6 +1,5 @@
 package com.termux.app.terminal;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 import android.widget.ListView;
@@ -32,11 +31,8 @@ public final class OmegaCommandActionAdapter {
     public boolean execute(@NonNull String commandId) {
         switch (commandId) {
             case "session.new":
-                if (activity.getTermuxSessionListViewController() == null) {
-                    activity.getTermuxTerminalSessionClient().addNewSession(false, null);
-                } else {
-                    activity.getTermuxTerminalSessionClient().addNewSession(false, null);
-                }
+                if (activity.getTermuxTerminalSessionClient() == null) return false;
+                activity.getTermuxTerminalSessionClient().addNewSession(false, null);
                 return true;
             case "session.next":
                 return moveSession(activity, 1);
@@ -53,7 +49,8 @@ public final class OmegaCommandActionAdapter {
                 TerminalSession session = activity.getCurrentSession();
                 if (session == null) return false;
                 session.reset();
-                activity.getTermuxTerminalSessionClient().onResetTerminalSession();
+                if (activity.getTermuxTerminalSessionClient() != null)
+                    activity.getTermuxTerminalSessionClient().onResetTerminalSession();
                 activity.showToast(activity.getString(R.string.msg_terminal_reset), true);
                 return true;
             case "navigation.drawer":
@@ -66,8 +63,8 @@ public final class OmegaCommandActionAdapter {
                 ActivityUtils.startActivity(activity, new Intent(activity, HelpActivity.class));
                 return true;
             case "editing.paste":
-                activity.getTerminalView().pasteClipboard();
-                return true;
+                Logger.logVerbose(LOG_TAG, "Paste command is reserved for the terminal view adapter");
+                return false;
             case "editing.select-url":
                 activity.getTermuxTerminalViewClient().showUrlSelection();
                 return true;
