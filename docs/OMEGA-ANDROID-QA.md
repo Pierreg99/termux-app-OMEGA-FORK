@@ -7,7 +7,7 @@ This runbook is the device-level validation layer for the OMEGA Command Center a
 ## Preconditions
 
 - Android device or emulator connected through `adb`.
-- Debug APK built from the same `master` revision under test.
+- Debug APK built from the exact `master` revision under test.
 - USB debugging enabled for a physical device.
 - Optional hardware keyboard available for keyboard-path validation.
 - TalkBack available for accessibility traversal.
@@ -29,7 +29,7 @@ adb shell am force-stop com.termux
 adb shell monkey -p com.termux 1
 ```
 
-## P2.2 functional matrix
+## P2.3 functional matrix
 
 | Area | Action | Expected result |
 |---|---|---|
@@ -60,7 +60,7 @@ adb shell monkey -p com.termux 1
 
 ## Hardware-keyboard checks
 
-The existing terminal hardware-shortcut path already handles session switching and other Ctrl+Alt actions. P2.1 currently requires the palette to be opened through its launcher before keyboard navigation begins.
+The terminal hardware-key path already handles Ctrl+Alt session navigation and other actions. P2.3 must validate the Command Center after it has been opened through its launcher.
 
 Validate:
 
@@ -68,7 +68,8 @@ Validate:
 - Enter executes the selected action
 - Esc closes the palette
 - typing into the search field filters commands
-- terminal shell input is unchanged when the palette is closed
+- closed palette leaves terminal shell input unchanged
+- Ctrl+Alt session shortcuts still work after closing the palette
 
 ## Screenshot evidence
 
@@ -92,8 +93,12 @@ Use one capture per acceptance state and review at native device resolution. Scr
 
 ## Recording results
 
-Record the Android model/emulator profile, Android version, screen density, hardware keyboard state, TalkBack state, tested commit SHA, and any failures in the QA report before marking P2.3 complete.
+Record the Android model/emulator profile, Android version, API level, screen density, hardware keyboard state, TalkBack state, tested commit SHA, and any failures in `qa/P2.3-ANDROID-QA-RESULTS.md` before marking P2.3 complete.
 
 ## Current status
 
-P2.2 source implementation is complete. Real device validation and screenshot capture require an Android runtime/device and are intentionally not marked passed until evidence exists.
+**Prepared, not executed.** The source and QA runbook are ready, but this execution environment does not expose an Android device/emulator or `adb`; therefore no runtime pass or screenshot evidence is claimed.
+
+## Release gate
+
+P2.3 can only be marked complete after real runtime execution, accessibility verification, hardware-keyboard smoke testing, screenshot capture, and repository evidence review.
