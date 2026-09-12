@@ -20,6 +20,16 @@ This runbook is the device-level validation layer for the OMEGA Command Center a
 
 Verify the generated APK path before installing; do not assume a fixed output filename when ABI/version configuration changes it.
 
+## Automated device bootstrap / capture
+
+A reproducible runner is provided at `qa/run-p2.3-device-qa.sh`.
+
+```bash
+bash qa/run-p2.3-device-qa.sh <debug-apk> qa/screenshots/p2.3
+```
+
+The runner verifies `adb`, requires exactly one online device, installs the APK, launches `com.termux`, captures portrait and landscape evidence, and records basic device metadata. It does not mark TalkBack, hardware-keyboard, or functional acceptance as passed automatically.
+
 ## Install and launch
 
 ```bash
