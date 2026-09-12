@@ -30,4 +30,8 @@ public final class OmegaCommandState {
         if (next < 0) next += itemCount;
         selectedIndex = next;
     }
+
+    public void resetSelection() {
+        selectedIndex = 0;
+    }
 }
