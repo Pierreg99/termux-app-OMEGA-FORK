@@ -4,8 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,12 +14,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.termux.app.TermuxActivity;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,6 +29,7 @@ import java.util.Locale;
 public final class OmegaCommandPalette extends Dialog {
     private final TermuxActivity activity;
     private final OmegaCommandActionAdapter actionAdapter;
+    private final OmegaCommandPreferenceStore preferences;
     private final OmegaCommandState state = new OmegaCommandState();
     private final EditText search;
     private final LinearLayout results;
@@ -42,6 +43,7 @@ public final class OmegaCommandPalette extends Dialog {
         }
         activity = (TermuxActivity) context;
         actionAdapter = new OmegaCommandActionAdapter(activity);
+        preferences = new OmegaCommandPreferenceStore(context);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         LinearLayout root = new LinearLayout(context);
@@ -68,6 +70,12 @@ public final class OmegaCommandPalette extends Dialog {
         search.setSelectAllOnFocus(false);
         root.addView(search, new LinearLayout.LayoutParams(-1, dp(48)));
 
+        TextView hint = new TextView(context);
+        hint.setText("↑ ↓ navigate   Enter execute   Long-press favorite   Esc close");
+        hint.setTextSize(11);
+        hint.setAlpha(0.7f);
+        hint.setPadding(0, dp(8), 0, 0);
+
         resultsScroll = new ScrollView(context);
         resultsScroll.setContentDescription("OMEGA command results");
         results = new LinearLayout(context);
@@ -76,24 +84,18 @@ public final class OmegaCommandPalette extends Dialog {
         LinearLayout.LayoutParams resultsParams = new LinearLayout.LayoutParams(-1, 0, 1f);
         resultsParams.topMargin = dp(8);
         root.addView(resultsScroll, resultsParams);
-
-        TextView hint = new TextView(context);
-        hint.setText("↑ ↓  navigate    Enter  execute    Esc  close");
-        hint.setTextSize(11);
-        hint.setAlpha(0.7f);
-        hint.setPadding(0, dp(8), 0, 0);
         root.addView(hint, new LinearLayout.LayoutParams(-1, -2));
 
         setContentView(root);
         refresh();
 
-        search.addTextChangedListener(new TextWatcher() {
+        search.addTextChangedListener(new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 state.setQuery(s.toString());
                 refresh();
             }
-            @Override public void afterTextChanged(Editable s) { }
+            @Override public void afterTextChanged(android.text.Editable s) { }
         });
         search.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
@@ -137,30 +139,53 @@ public final class OmegaCommandPalette extends Dialog {
     private void refresh() {
         String query = state.getQuery().trim().toLowerCase(Locale.ROOT);
         int sessionCount = activity.getTermuxService() == null ? 0 : activity.getTermuxService().getTermuxSessionsSize();
+        List<OmegaCommand> catalog = OmegaCommandRegistry.sessionAwareCommands(sessionCount);
         filtered = new ArrayList<>();
-        for (OmegaCommand command : OmegaCommandRegistry.sessionAwareCommands(sessionCount)) {
+        for (OmegaCommand command : catalog) {
             String haystack = (command.getId() + " " + command.getTitle() + " " + command.getCategory().name()).toLowerCase(Locale.ROOT);
             if (query.isEmpty() || haystack.contains(query)) filtered.add(command);
         }
+        final List<String> order = preferences.orderedCommandIds();
+        final List<String> favorites = preferences.favoriteCommandIds();
+        filtered.sort(Comparator
+            .comparing((OmegaCommand c) -> !favorites.contains(c.getId()))
+            .thenComparingInt(c -> {
+                int index = order.indexOf(c.getId());
+                return index < 0 ? Integer.MAX_VALUE : index;
+            })
+            .thenComparing(OmegaCommand::getTitle));
         if (state.getSelectedIndex() >= filtered.size()) state.resetSelection();
 
         results.removeAllViews();
         for (int i = 0; i < filtered.size(); i++) {
             OmegaCommand command = filtered.get(i);
             TextView item = new TextView(getContext());
-            String label = command.getTitle() + (command.getShortcut() == null ? "" : "    " + command.getShortcut());
+            boolean favorite = favorites.contains(command.getId());
+            String shortcut = preferences.getCustomShortcut(command.getId());
+            if (shortcut.isEmpty()) shortcut = command.getShortcut();
+            String marker = favorite ? "★ " : "";
+            String label = marker + command.getTitle() + (shortcut == null ? "" : "    " + shortcut);
             item.setText(label);
-            item.setContentDescription(command.getTitle() + " command");
+            item.setContentDescription((favorite ? "Favorite, " : "") + command.getTitle() + " command");
             item.setTextSize(15);
             item.setGravity(Gravity.CENTER_VERTICAL);
             item.setFocusable(true);
             item.setClickable(true);
+            item.setLongClickable(true);
             item.setPadding(dp(12), 0, dp(12), 0);
             final int index = i;
             item.setOnClickListener(v -> {
                 state.resetSelection();
                 state.moveSelection(index, filtered.size());
                 executeSelected();
+            });
+            item.setOnLongClickListener(v -> {
+                preferences.setFavorite(command.getId(), !preferences.isFavorite(command.getId()));
+                Toast.makeText(getContext(), preferences.isFavorite(command.getId())
+                    ? "Favorite added: " + command.getTitle()
+                    : "Favorite removed: " + command.getTitle(), Toast.LENGTH_SHORT).show();
+                refresh();
+                return true;
             });
             results.addView(item, new LinearLayout.LayoutParams(-1, dp(48)));
         }
@@ -182,7 +207,9 @@ public final class OmegaCommandPalette extends Dialog {
     private void executeSelected() {
         if (filtered.isEmpty()) return;
         int index = Math.max(0, Math.min(state.getSelectedIndex(), filtered.size() - 1));
-        if (actionAdapter.execute(filtered.get(index))) dismiss();
+        OmegaCommand command = filtered.get(index);
+        preferences.recordRecent(command.getId());
+        if (actionAdapter.execute(command)) dismiss();
     }
 
     private GradientDrawable roundBackground(int color, int radiusDp) {
