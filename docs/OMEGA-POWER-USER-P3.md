@@ -40,34 +40,36 @@ Profiles are metadata/configuration only. They do not replace `TerminalSession` 
 
 ### Implemented
 
+- built-in OMEGA Default, Neon and Focus presets
 - versioned JSON export/import via `OmegaSessionProfileCodec`
 - deterministic profile ordering by profile id
 - validation before persistence
 - unsupported schema versions rejected
 - malformed imports rejected without partial writes
-- non-destructive merge import by default
-- explicit replace import mode
+- clipboard-based import/export entry points
+- explicit reset-to-default action
 - theme preset identifiers travel with each exported profile
-- missing profiles fall back to a default using the requested profile id
 
 The codec does not directly touch terminal state. Import is therefore safe to validate before a later UI layer applies a profile to a session.
 
-**Status: implemented at storage/serialization layer.**
-
-### Next UI layer
-
-The remaining P3.2 UI work is deliberately separate: preset picker, import/export entry points, confirmation for replace-mode import, and reset-to-default affordance.
+**Status: UI-integrated baseline complete.**
 
 ## P3.3 — Command Center Power Layer
 
-- favorite/pinned commands
-- custom display ordering
-- category filters
-- recent-command section
-- configurable OMEGA-only shortcuts
-- conflict detection against existing Termux shortcuts
+### Implemented baseline
 
-The existing immutable command registry remains the source catalog. User preferences should decorate the catalog rather than mutate command definitions.
+- favorite/pinned commands
+- long-press favorite toggle in the command palette
+- favorites promoted in palette ordering
+- bounded recent-command recording
+- persistent custom display ordering data
+- configurable OMEGA-only shortcut overrides
+- conflict detection against built-in and custom OMEGA shortcuts
+- drawer entry point for command preferences
+
+The existing immutable command registry remains the source catalog. User preferences decorate the catalog rather than mutate command definitions.
+
+**Status: UI-integrated baseline complete.**
 
 ## P3.4 — Explicit Session Restore
 
@@ -90,7 +92,7 @@ The existing immutable command registry remains the source catalog. User prefere
 ```text
 OMEGA Preferences
         │
-        ├── SessionProfileStore
+        ├── SessionProfileStore / ProfileCodec
         ├── ThemePresetStore
         ├── CommandPreferenceStore
         └── SessionRestoreStore
@@ -112,8 +114,8 @@ Storage interfaces should remain small so later persistence changes do not leak 
 - invalid-import rejection
 - unsupported-version rejection
 - deterministic export ordering
-- store merge and replace semantics
-- missing-profile fallback stability
+- favorite persistence
+- recent-history bounds
 - shortcut conflict resolution
 - deterministic command ordering
 - restore-state eligibility
@@ -125,12 +127,13 @@ Storage interfaces should remain small so later persistence changes do not leak 
 - keyboard navigation through power-user controls
 - TalkBack traversal
 - portrait/landscape visual checks
+- favorite interaction and shortcut editor
 
 ## Rollout order
 
 1. P3.1 Session Profiles — implemented
-2. P3.2 Presets + import/export — storage/codec implemented; UI layer next
-3. P3.3 Command favorites/shortcuts
+2. P3.2 Presets + import/export — UI baseline implemented
+3. P3.3 Command favorites/shortcuts — UI baseline implemented
 4. P3.4 Explicit session restore
 5. P3.5 Advanced terminal controls
 
