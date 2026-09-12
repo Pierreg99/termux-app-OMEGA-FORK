@@ -1,6 +1,7 @@
 package com.termux.app.terminal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
@@ -34,10 +35,33 @@ public class OmegaCommandPaletteTest {
     @Test
     public void registryContainsCorePaletteCommands() {
         List<OmegaCommand> commands = OmegaCommandRegistry.defaultCommands();
-        assertTrue(commands.size() >= 12);
+        assertTrue(commands.size() >= 15);
         assertTrue(contains(commands, "session.new"));
+        assertTrue(contains(commands, "session.rename-current"));
+        assertTrue(contains(commands, "session.close-current"));
         assertTrue(contains(commands, "terminal.keyboard"));
-        assertTrue(contains(commands, "navigation.settings"));
+        assertTrue(contains(commands, "terminal.keep-screen-on"));
+        assertTrue(contains(commands, "editing.paste"));
+        assertFalse(contains(commands, "session.select.1"));
+    }
+
+    @Test
+    public void sessionAwareRegistryAddsOnlyAvailableSessionSelectors() {
+        List<OmegaCommand> commands = OmegaCommandRegistry.sessionAwareCommands(3);
+        assertTrue(contains(commands, "session.select.1"));
+        assertTrue(contains(commands, "session.select.2"));
+        assertTrue(contains(commands, "session.select.3"));
+        assertFalse(contains(commands, "session.select.4"));
+    }
+
+    @Test
+    public void sessionAwareRegistryCapsSessionSelectors() {
+        List<OmegaCommand> commands = OmegaCommandRegistry.sessionAwareCommands(99);
+        int selectors = 0;
+        for (OmegaCommand command : commands) {
+            if (command.getId().startsWith("session.select.")) selectors++;
+        }
+        assertEquals(8, selectors);
     }
 
     @Test
