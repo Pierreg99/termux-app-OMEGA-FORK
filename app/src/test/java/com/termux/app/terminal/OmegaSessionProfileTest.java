@@ -52,6 +52,41 @@ public class OmegaSessionProfileTest {
         assertEquals(0, store.profileIds().length);
     }
 
+    @Test
+    public void storeImportsWithoutReplacingByDefaultAndCanReplace() {
+        Context context = RuntimeEnvironment.getApplication();
+        OmegaSessionProfileStore store = new OmegaSessionProfileStore(context);
+        OmegaSessionProfile existing = new OmegaSessionProfile(
+            "existing", "Existing", 14, "omega-dark", "block", 2000, false);
+        OmegaSessionProfile imported = new OmegaSessionProfile(
+            "imported", "Imported", 18, "omega-neon", "bar", 7000, true);
+        store.delete(existing.getId());
+        store.delete(imported.getId());
+        store.save(existing);
+
+        String json = OmegaSessionProfileCodec.exportProfiles(java.util.Collections.singletonList(imported));
+        store.importAll(json, false);
+        assertTrue(store.contains(existing.getId()));
+        assertTrue(store.contains(imported.getId()));
+
+        store.importAll(json, true);
+        assertFalse(store.contains(existing.getId()));
+        assertTrue(store.contains(imported.getId()));
+        assertEquals("Imported", store.load(imported.getId()).getDisplayName());
+
+        store.delete(imported.getId());
+    }
+
+    @Test
+    public void missingProfileUsesRequestedId() {
+        Context context = RuntimeEnvironment.getApplication();
+        OmegaSessionProfileStore store = new OmegaSessionProfileStore(context);
+        store.delete("scratch");
+
+        OmegaSessionProfile loaded = store.load("scratch");
+        assertEquals("scratch", loaded.getId());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void emptyProfileIdIsRejected() {
         new OmegaSessionProfile(" ", "Invalid", 14, "omega-dark", "block", 100, false);
