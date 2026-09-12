@@ -1,8 +1,10 @@
 package com.termux.app;
 
+import android.content.Context;
+import android.content.res.XmlResourceParser;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsCompat;
@@ -16,6 +18,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @RunWith(RobolectricTestRunner.class)
 public class OmegaP1UiTest {
@@ -51,16 +56,31 @@ public class OmegaP1UiTest {
     }
 
     @Test
-    public void activityLayout_containsP1TerminalSurfaces() {
-        View root = LayoutInflater.from(RuntimeEnvironment.getApplication())
-            .inflate(R.layout.activity_termux, null, false);
+    public void activityLayout_containsP1TerminalSurfaces() throws Exception {
+        Context context = RuntimeEnvironment.getApplication();
+        Set<Integer> ids = new HashSet<>();
+        XmlResourceParser parser = context.getResources().getXml(R.layout.activity_termux);
+        try {
+            int event;
+            while ((event = parser.next()) != XmlResourceParser.END_DOCUMENT) {
+                if (event != XmlResourceParser.START_TAG) continue;
+                AttributeSet attrs = parser;
+                int id = attrs.getAttributeResourceValue("http://schemas.android.com/apk/res/android", "id", 0);
+                if (id != 0) ids.add(id);
+            }
+        } finally {
+            parser.close();
+        }
 
-        Assert.assertNotNull(root.findViewById(R.id.drawer_layout));
-        Assert.assertNotNull(root.findViewById(R.id.terminal_view));
-        Assert.assertNotNull(root.findViewById(R.id.terminal_sessions_list));
-        Assert.assertNotNull(root.findViewById(R.id.toggle_keyboard_button));
-        Assert.assertNotNull(root.findViewById(R.id.new_session_button));
-        Assert.assertNotNull(root.findViewById(R.id.terminal_toolbar_view_pager));
-        Assert.assertTrue(root.findViewById(R.id.activity_termux_bottom_space_view) instanceof ViewGroup == false);
+        Assert.assertTrue(ids.contains(R.id.drawer_layout));
+        Assert.assertTrue(ids.contains(R.id.terminal_view));
+        Assert.assertTrue(ids.contains(R.id.terminal_sessions_list));
+        Assert.assertTrue(ids.contains(R.id.toggle_keyboard_button));
+        Assert.assertTrue(ids.contains(R.id.new_session_button));
+        Assert.assertTrue(ids.contains(R.id.terminal_toolbar_view_pager));
+        Assert.assertTrue(ids.contains(R.id.omega_command_palette_button));
+        Assert.assertTrue(ids.contains(R.id.omega_profile_preset_button));
+        Assert.assertTrue(ids.contains(R.id.omega_command_preference_button));
+        Assert.assertTrue(ids.contains(R.id.activity_termux_bottom_space_view));
     }
 }
