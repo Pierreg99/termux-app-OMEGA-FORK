@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="t d">
+<title id="t">OMEGA Terminal Toolbar</title><desc id="d">OMEGA dark terminal toolbar and extra-key controls.</desc>
+<rect width="1200" height="360" fill="#05070A"/>
+<text x="36" y="52" fill="#63D7FF" font-family="sans-serif" font-size="24" font-weight="700">OMEGA TOOLBAR</text>
+<text x="36" y="82" fill="#8996A4" font-family="sans-serif" font-size="14">Semantic surface + accessible terminal actions</text>
+<rect x="36" y="112" width="1128" height="64" rx="10" fill="#0E141D" stroke="#263241"/>
+<g font-family="sans-serif" font-size="15" font-weight="700">
+<rect x="54" y="126" width="142" height="36" rx="8" fill="#151E2A"/><text x="82" y="150" fill="#D9E2EC">CTRL</text>
+<rect x="208" y="126" width="142" height="36" rx="8" fill="#151E2A"/><text x="253" y="150" fill="#D9E2EC">ALT</text>
+<rect x="362" y="126" width="142" height="36" rx="8" fill="#151E2A"/><text x="408" y="150" fill="#D9E2EC">ESC</text>
+<rect x="516" y="126" width="142" height="36" rx="8" fill="#151E2A"/><text x="552" y="150" fill="#63D7FF">TAB</text>
+<rect x="670" y="126" width="142" height="36" rx="8" fill="#151E2A"/><text x="714" y="150" fill="#D9E2EC">UP</text>
+<rect x="824" y="126" width="142" height="36" rx="8" fill="#151E2A"/><text x="861" y="150" fill="#D9E2EC">DOWN</text>
+<rect x="978" y="126" width="168" height="36" rx="8" fill="#151E2A"/><text x="1020" y="150" fill="#63D7FF">NEW SESSION</text>
+</g>
+<rect x="36" y="212" width="1128" height="92" rx="10" fill="#0E141D"/>
+<text x="60" y="243" fill="#F4F7FA" font-family="sans-serif" font-size="17" font-weight="700">Keyboard / Insets</text>
+<text x="60" y="270" fill="#A7B4C2" font-family="sans-serif" font-size="14">Bottom safe-area is reserved without covering terminal content.</text>
+<circle cx="1090" cy="258" r="10" fill="#55D187"/>
+</svg>
