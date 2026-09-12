@@ -21,21 +21,15 @@ public final class OmegaSessionProfileCodec {
 
     @NonNull
     public static String exportProfiles(@NonNull Collection<OmegaSessionProfile> profiles) {
-        try {
-            List<OmegaSessionProfile> ordered = new ArrayList<>(profiles);
-            Collections.sort(ordered, Comparator.comparing(OmegaSessionProfile::getId));
+        List<OmegaSessionProfile> ordered = new ArrayList<>(profiles);
+        Collections.sort(ordered, Comparator.comparing(OmegaSessionProfile::getId));
 
-            JSONObject root = new JSONObject();
-            root.put(ROOT_VERSION, CURRENT_VERSION);
-            JSONArray entries = new JSONArray();
-            for (OmegaSessionProfile profile : ordered) {
-                entries.put(toJson(profile));
-            }
-            root.put(ROOT_PROFILES, entries);
-            return root.toString();
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to export OMEGA profiles", e);
+        StringBuilder json = new StringBuilder("{\"version\":1,\"profiles\":[");
+        for (int i = 0; i < ordered.size(); i++) {
+            if (i > 0) json.append(',');
+            appendProfile(json, ordered.get(i));
         }
+        return json.append("]}").toString();
     }
 
     @NonNull
@@ -59,17 +53,40 @@ public final class OmegaSessionProfileCodec {
         }
     }
 
+    private static void appendProfile(@NonNull StringBuilder json, @NonNull OmegaSessionProfile profile) {
+        json.append('{')
+            .append("\"id\":").append(quote(profile.getId()))
+            .append(",\"displayName\":").append(quote(profile.getDisplayName()))
+            .append(",\"fontSize\":").append(profile.getFontSize())
+            .append(",\"themePreset\":").append(quote(profile.getThemePreset()))
+            .append(",\"cursorStyle\":").append(quote(profile.getCursorStyle()))
+            .append(",\"scrollbackLines\":").append(profile.getScrollbackLines())
+            .append(",\"keepScreenOn\":").append(profile.isKeepScreenOn())
+            .append('}');
+    }
+
     @NonNull
-    private static JSONObject toJson(@NonNull OmegaSessionProfile profile) throws Exception {
-        JSONObject object = new JSONObject();
-        object.put("id", profile.getId());
-        object.put("displayName", profile.getDisplayName());
-        object.put("fontSize", profile.getFontSize());
-        object.put("themePreset", profile.getThemePreset());
-        object.put("cursorStyle", profile.getCursorStyle());
-        object.put("scrollbackLines", profile.getScrollbackLines());
-        object.put("keepScreenOn", profile.isKeepScreenOn());
-        return object;
+    private static String quote(@NonNull String value) {
+        StringBuilder quoted = new StringBuilder(value.length() + 2).append('"');
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '"': quoted.append("\\\""); break;
+                case '\\': quoted.append("\\\\"); break;
+                case '\b': quoted.append("\\b"); break;
+                case '\f': quoted.append("\\f"); break;
+                case '\n': quoted.append("\\n"); break;
+                case '\r': quoted.append("\\r"); break;
+                case '\t': quoted.append("\\t"); break;
+                default:
+                    if (c < 0x20) {
+                        quoted.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        quoted.append(c);
+                    }
+            }
+        }
+        return quoted.append('"').toString();
     }
 
     @NonNull
