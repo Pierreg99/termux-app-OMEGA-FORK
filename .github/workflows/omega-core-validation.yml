@@ -33,3 +33,115 @@ jobs:
           test -s app/build/outputs/apk/debug/app-debug.apk
           test -s app/build/reports/tests/testDebugUnitTest/index.html
           echo "OMEGA core validation outputs present"
+
+  p2-3-emulator-gate:
+    name: P2.3 Android Emulator Gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Build debug APK and JVM tests
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --stacktrace
+
+      - name: Run Android emulator evidence checks
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          emulator-options: -no-window -no-audio -no-boot-anim
+          disable-animations: true
+          script: |
+            set -euo pipefail
+            mkdir -p qa/screenshots/p2.3
+            adb wait-for-device
+            APK="$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -n 1)"
+            test -n "$APK"
+            adb install -r "$APK"
+            adb shell pm path com.termux | grep -q 'package:'
+            adb shell am force-stop com.termux
+            adb shell monkey -p com.termux 1
+            sleep 10
+
+            adb shell input swipe 20 900 700 900 500
+            sleep 2
+            adb shell uiautomator dump /sdcard/omega-drawer.xml >/dev/null
+            adb shell cat /sdcard/omega-drawer.xml > qa/screenshots/p2.3/ui-dump-drawer.xml
+            bounds="$(adb shell cat /sdcard/omega-drawer.xml | grep -o 'text="COMMANDS"[^>]*bounds="\[[0-9,]*\]\[[0-9,]*\]"' | head -n 1 | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]"/\1 \2 \3 \4/p')"
+            test -n "$bounds"
+            read -r left top right bottom <<< "$bounds"
+            adb shell input tap "$(((left + right) / 2))" "$(((top + bottom) / 2))"
+            sleep 2
+
+            adb shell uiautomator dump /sdcard/omega-palette.xml >/dev/null
+            adb shell cat /sdcard/omega-palette.xml > qa/screenshots/p2.3/ui-dump-palette.xml
+            grep -q 'OMEGA COMMAND CENTER' qa/screenshots/p2.3/ui-dump-palette.xml
+            grep -q 'Search OMEGA commands' qa/screenshots/p2.3/ui-dump-palette.xml
+            adb exec-out screencap -p > qa/screenshots/p2.3/command-center-portrait.png
+
+            adb shell input tap 360 180
+            adb shell input text session
+            sleep 1
+            adb shell uiautomator dump /sdcard/omega-session.xml >/dev/null
+            adb shell cat /sdcard/omega-session.xml > qa/screenshots/p2.3/ui-dump-session-search.xml
+            grep -qi 'session' qa/screenshots/p2.3/ui-dump-session-search.xml
+            adb exec-out screencap -p > qa/screenshots/p2.3/session-search.png
+
+            adb shell settings put system accelerometer_rotation 0
+            adb shell settings put system user_rotation 1
+            sleep 2
+            adb exec-out screencap -p > qa/screenshots/p2.3/command-center-landscape.png
+            adb shell settings put system user_rotation 0
+
+            cat > qa/screenshots/p2.3/DEVICE.txt <<EOF
+Serial: $(adb get-serialno | tr -d '\r')
+Android: $(adb shell getprop ro.build.version.release | tr -d '\r')
+API: $(adb shell getprop ro.build.version.sdk | tr -d '\r')
+Model: $(adb shell getprop ro.product.model | tr -d '\r')
+CapturedAtUTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+EOF
+
+            python3 - <<'PY'
+            from pathlib import Path
+            import struct
+            root = Path('qa/screenshots/p2.3')
+            def size(path):
+                data = path.read_bytes()
+                if data[:8] != b'\x89PNG\r\n\x1a\n':
+                    raise SystemExit(f'Not a PNG: {path}')
+                return struct.unpack('>II', data[16:24])
+            portrait = size(root / 'command-center-portrait.png')
+            landscape = size(root / 'command-center-landscape.png')
+            search = size(root / 'session-search.png')
+            if portrait == landscape:
+                raise SystemExit('Orientation evidence did not change dimensions')
+            (root / 'EVIDENCE.txt').write_text(
+                'P2.3 emulator gate passed\n'
+                f'portrait={portrait[0]}x{portrait[1]}\n'
+                f'landscape={landscape[0]}x{landscape[1]}\n'
+                f'search={search[0]}x{search[1]}\n',
+                encoding='utf-8')
+            PY
+
+      - name: Upload P2.3 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: omega-p2.3-emulator-evidence
+          path: |
+            qa/screenshots/p2.3/*.png
+            qa/screenshots/p2.3/*.xml
+            qa/screenshots/p2.3/*.txt
+          if-no-files-found: error
