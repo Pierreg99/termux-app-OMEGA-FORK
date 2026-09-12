@@ -62,7 +62,7 @@ public final class OmegaCommandPalette extends Dialog {
 
         search = new EditText(context);
         search.setSingleLine(true);
-        search.setHint("Search commands…");
+        search.setHint("Search OMEGA commands");
         search.setContentDescription("Search OMEGA commands");
         search.setTextSize(16);
         search.setImeOptions(EditorInfo.IME_ACTION_DONE);
