@@ -114,10 +114,10 @@
 
     </RelativeLayout>
 
-    <View
+    <com.termux.app.terminal.OmegaInsetSpacerView
         android:id="@+id/activity_termux_bottom_space_view"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/omega_inset_spacer_base"
         android:background="@android:color/transparent" />
 
 </com.termux.app.terminal.TermuxActivityRootView>
