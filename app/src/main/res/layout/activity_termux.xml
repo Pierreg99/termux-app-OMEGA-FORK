@@ -72,6 +72,15 @@
                         android:contentDescription="Open OMEGA Command Center" />
                 </LinearLayout>
 
+                <com.termux.app.terminal.OmegaProfilePresetButton
+                    android:id="@+id/omega_profile_preset_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/omega_touch_target"
+                    android:layout_marginHorizontal="@dimen/omega_space_2"
+                    android:layout_marginTop="@dimen/omega_space_1"
+                    android:minWidth="0dp"
+                    android:contentDescription="Open OMEGA theme and profile presets" />
+
                 <ListView
                     android:id="@+id/terminal_sessions_list"
                     android:layout_width="match_parent"
