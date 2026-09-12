@@ -138,7 +138,7 @@ public final class OmegaCommandPalette extends Dialog {
             String haystack = (command.getId() + " " + command.getTitle() + " " + command.getCategory().name()).toLowerCase(Locale.ROOT);
             if (query.isEmpty() || haystack.contains(query)) filtered.add(command);
         }
-        if (state.getSelectedIndex() >= filtered.size()) state.moveSelection(-filtered.size(), filtered.size());
+        if (state.getSelectedIndex() >= filtered.size()) state.resetSelection();
 
         results.removeAllViews();
         for (int i = 0; i < filtered.size(); i++) {
@@ -150,7 +150,8 @@ public final class OmegaCommandPalette extends Dialog {
             item.setPadding(dp(12), 0, dp(12), 0);
             final int index = i;
             item.setOnClickListener(v -> {
-                state.moveSelection(index - state.getSelectedIndex(), filtered.size());
+                state.resetSelection();
+                state.moveSelection(index, filtered.size());
                 executeSelected();
             });
             results.addView(item, new LinearLayout.LayoutParams(-1, dp(48)));
