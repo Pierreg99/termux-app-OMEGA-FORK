@@ -9,17 +9,37 @@ import java.util.List;
 /** Default searchable command catalog for the OMEGA Command Center. */
 public final class OmegaCommandRegistry {
 
+    private static final int MAX_SESSION_COMMANDS = 8;
+
     private OmegaCommandRegistry() { }
 
     @NonNull
     public static List<OmegaCommand> defaultCommands() {
+        return sessionAwareCommands(0);
+    }
+
+    @NonNull
+    public static List<OmegaCommand> sessionAwareCommands(int sessionCount) {
         List<OmegaCommand> commands = new ArrayList<>();
 
         commands.add(new OmegaCommand("session.new", OmegaCommand.Category.SESSIONS, "New session", "Ctrl+Shift+N"));
         commands.add(new OmegaCommand("session.next", OmegaCommand.Category.SESSIONS, "Next session", "Ctrl+Tab"));
         commands.add(new OmegaCommand("session.previous", OmegaCommand.Category.SESSIONS, "Previous session", "Ctrl+Shift+Tab"));
+        commands.add(new OmegaCommand("session.rename-current", OmegaCommand.Category.SESSIONS, "Rename current session", null));
+        commands.add(new OmegaCommand("session.close-current", OmegaCommand.Category.SESSIONS, "Kill current session", null));
+
+        int visibleSessionCount = Math.max(0, Math.min(sessionCount, MAX_SESSION_COMMANDS));
+        for (int i = 1; i <= visibleSessionCount; i++) {
+            commands.add(new OmegaCommand(
+                "session.select." + i,
+                OmegaCommand.Category.SESSIONS,
+                "Select session " + i,
+                "Alt+" + i));
+        }
+
         commands.add(new OmegaCommand("terminal.keyboard", OmegaCommand.Category.TERMINAL, "Toggle keyboard", null));
         commands.add(new OmegaCommand("terminal.toolbar", OmegaCommand.Category.TERMINAL, "Toggle toolbar", null));
+        commands.add(new OmegaCommand("terminal.keep-screen-on", OmegaCommand.Category.TERMINAL, "Toggle keep screen on", null));
         commands.add(new OmegaCommand("terminal.reset", OmegaCommand.Category.TERMINAL, "Reset terminal", null));
         commands.add(new OmegaCommand("navigation.drawer", OmegaCommand.Category.NAVIGATION, "Open session drawer", "Ctrl+Alt+D"));
         commands.add(new OmegaCommand("navigation.settings", OmegaCommand.Category.NAVIGATION, "Open settings", null));
