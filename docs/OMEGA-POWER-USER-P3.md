@@ -34,13 +34,29 @@ Give each terminal session an optional named profile containing presentation and
 
 Profiles are metadata/configuration only. They do not replace `TerminalSession` or the session client lifecycle.
 
+**Status: implemented as an isolated model/store layer.**
+
 ## P3.2 — Theme & Profile Presets
 
-- built-in OMEGA presets
-- import/export as versioned JSON
-- validation before import
-- deterministic fallback for unknown fields
-- explicit reset-to-default action
+### Implemented
+
+- versioned JSON export/import via `OmegaSessionProfileCodec`
+- deterministic profile ordering by profile id
+- validation before persistence
+- unsupported schema versions rejected
+- malformed imports rejected without partial writes
+- non-destructive merge import by default
+- explicit replace import mode
+- theme preset identifiers travel with each exported profile
+- missing profiles fall back to a default using the requested profile id
+
+The codec does not directly touch terminal state. Import is therefore safe to validate before a later UI layer applies a profile to a session.
+
+**Status: implemented at storage/serialization layer.**
+
+### Next UI layer
+
+The remaining P3.2 UI work is deliberately separate: preset picker, import/export entry points, confirmation for replace-mode import, and reset-to-default affordance.
 
 ## P3.3 — Command Center Power Layer
 
@@ -94,6 +110,10 @@ Storage interfaces should remain small so later persistence changes do not leak 
 
 - profile serialization round-trip
 - invalid-import rejection
+- unsupported-version rejection
+- deterministic export ordering
+- store merge and replace semantics
+- missing-profile fallback stability
 - shortcut conflict resolution
 - deterministic command ordering
 - restore-state eligibility
@@ -108,8 +128,8 @@ Storage interfaces should remain small so later persistence changes do not leak 
 
 ## Rollout order
 
-1. P3.1 Session Profiles
-2. P3.2 Presets + import/export
+1. P3.1 Session Profiles — implemented
+2. P3.2 Presets + import/export — storage/codec implemented; UI layer next
 3. P3.3 Command favorites/shortcuts
 4. P3.4 Explicit session restore
 5. P3.5 Advanced terminal controls
