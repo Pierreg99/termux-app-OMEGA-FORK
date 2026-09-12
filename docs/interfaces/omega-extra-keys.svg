@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" role="img" aria-labelledby="t d">
+<title id="t">OMEGA Extra Keys Interface</title><desc id="d">Configurable extra-key grid for terminal power users.</desc>
+<rect width="900" height="500" fill="#070A0F"/>
+<text x="36" y="52" fill="#63D7FF" font-family="sans-serif" font-size="25" font-weight="700">EXTRA KEYS</text>
+<text x="36" y="80" fill="#8996A4" font-family="sans-serif" font-size="14">P1 target: clear active state and profile-ready component surface</text>
+<g font-family="monospace" font-size="18" font-weight="700" text-anchor="middle">
+<g>
+<rect x="36" y="118" width="130" height="70" rx="10" fill="#151E2A" stroke="#63D7FF"/><text x="101" y="160" fill="#63D7FF">CTRL</text>
+<rect x="182" y="118" width="130" height="70" rx="10" fill="#151E2A"/><text x="247" y="160" fill="#E6EDF3">ALT</text>
+<rect x="328" y="118" width="130" height="70" rx="10" fill="#151E2A"/><text x="393" y="160" fill="#E6EDF3">ESC</text>
+<rect x="474" y="118" width="130" height="70" rx="10" fill="#151E2A"/><text x="539" y="160" fill="#E6EDF3">TAB</text>
+<rect x="620" y="118" width="130" height="70" rx="10" fill="#151E2A"/><text x="685" y="160" fill="#E6EDF3">|</text>
+</g>
+<g>
+<rect x="36" y="208" width="130" height="70" rx="10" fill="#151E2A"/><text x="101" y="250" fill="#E6EDF3">HOME</text>
+<rect x="182" y="208" width="130" height="70" rx="10" fill="#151E2A"/><text x="247" y="250" fill="#E6EDF3">END</text>
+<rect x="328" y="208" width="130" height="70" rx="10" fill="#151E2A"/><text x="393" y="250" fill="#E6EDF3">↑</text>
+<rect x="474" y="208" width="130" height="70" rx="10" fill="#151E2A"/><text x="539" y="250" fill="#E6EDF3">↓</text>
+<rect x="620" y="208" width="130" height="70" rx="10" fill="#151E2A"/><text x="685" y="250" fill="#E6EDF3">ENTER</text>
+</g>
+</g>
+<rect x="36" y="320" width="714" height="90" rx="10" fill="#0E141D"/>
+<text x="58" y="351" fill="#F4F7FA" font-family="sans-serif" font-size="16" font-weight="700">State model</text>
+<text x="58" y="378" fill="#A7B4C2" font-family="sans-serif" font-size="14">default · pressed · active · disabled</text>
+<rect x="786" y="320" width="78" height="90" rx="10" fill="#151E2A"/>
+<text x="825" y="371" fill="#55D187" font-family="sans-serif" font-size="15" text-anchor="middle">READY</text>
+</svg>
