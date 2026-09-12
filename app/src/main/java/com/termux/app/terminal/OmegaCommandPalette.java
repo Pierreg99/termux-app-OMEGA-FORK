@@ -1,0 +1,187 @@
+package com.termux.app.terminal;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+
+import com.termux.app.TermuxActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+/** Searchable keyboard-first command palette for OMEGA. */
+public final class OmegaCommandPalette extends Dialog {
+    private final TermuxActivity activity;
+    private final OmegaCommandActionAdapter actionAdapter;
+    private final OmegaCommandState state = new OmegaCommandState();
+    private final EditText search;
+    private final LinearLayout results;
+    private final ScrollView resultsScroll;
+    private List<OmegaCommand> filtered = new ArrayList<>();
+
+    public OmegaCommandPalette(@NonNull Context context) {
+        super(context);
+        if (!(context instanceof TermuxActivity)) {
+            throw new IllegalArgumentException("OmegaCommandPalette requires TermuxActivity context");
+        }
+        activity = (TermuxActivity) context;
+        actionAdapter = new OmegaCommandActionAdapter(activity);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LinearLayout root = new LinearLayout(context);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(dp(16), dp(12), dp(16), dp(12));
+        root.setBackground(roundBackground(0xEE101820, 18));
+
+        TextView title = new TextView(context);
+        title.setText("OMEGA COMMAND CENTER");
+        title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        title.setTextSize(12);
+        title.setLetterSpacing(0.08f);
+        title.setPadding(0, 0, 0, dp(8));
+        root.addView(title, new LinearLayout.LayoutParams(-1, -2));
+
+        search = new EditText(context);
+        search.setSingleLine(true);
+        search.setHint("Search commands…");
+        search.setTextSize(16);
+        search.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        search.setPadding(dp(12), 0, dp(12), 0);
+        search.setSelectAllOnFocus(false);
+        root.addView(search, new LinearLayout.LayoutParams(-1, dp(48)));
+
+        resultsScroll = new ScrollView(context);
+        results = new LinearLayout(context);
+        results.setOrientation(LinearLayout.VERTICAL);
+        resultsScroll.addView(results, new ScrollView.LayoutParams(-1, -2));
+        LinearLayout.LayoutParams resultsParams = new LinearLayout.LayoutParams(-1, 0, 1f);
+        resultsParams.topMargin = dp(8);
+        root.addView(resultsScroll, resultsParams);
+
+        TextView hint = new TextView(context);
+        hint.setText("↑ ↓  navigate    Enter  execute    Esc  close");
+        hint.setTextSize(11);
+        hint.setAlpha(0.7f);
+        hint.setPadding(0, dp(8), 0, 0);
+        root.addView(hint, new LinearLayout.LayoutParams(-1, -2));
+
+        setContentView(root);
+        refresh();
+
+        search.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                state.setQuery(s.toString());
+                refresh();
+            }
+            @Override public void afterTextChanged(Editable s) { }
+        });
+        search.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
+            if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                state.moveSelection(1, filtered.size());
+                refreshSelection();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                state.moveSelection(-1, filtered.size());
+                refreshSelection();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+                executeSelected();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_ESCAPE) {
+                dismiss();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Window window = getWindow();
+        if (window == null) return;
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.width = Math.min((int) (activity.getResources().getDisplayMetrics().widthPixels * 0.92f), dp(640));
+        params.height = Math.min((int) (activity.getResources().getDisplayMetrics().heightPixels * 0.82f), dp(720));
+        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        params.y = dp(48);
+        window.setAttributes(params);
+        search.requestFocus();
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+    }
+
+    private void refresh() {
+        String query = state.getQuery().trim().toLowerCase(Locale.ROOT);
+        filtered = new ArrayList<>();
+        for (OmegaCommand command : OmegaCommandRegistry.defaultCommands()) {
+            String haystack = (command.getId() + " " + command.getTitle() + " " + command.getCategory().name()).toLowerCase(Locale.ROOT);
+            if (query.isEmpty() || haystack.contains(query)) filtered.add(command);
+        }
+        if (state.getSelectedIndex() >= filtered.size()) state.moveSelection(-filtered.size(), filtered.size());
+
+        results.removeAllViews();
+        for (int i = 0; i < filtered.size(); i++) {
+            OmegaCommand command = filtered.get(i);
+            TextView item = new TextView(getContext());
+            item.setText(command.getTitle() + (command.getShortcut() == null ? "" : "    " + command.getShortcut()));
+            item.setTextSize(15);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setPadding(dp(12), 0, dp(12), 0);
+            final int index = i;
+            item.setOnClickListener(v -> {
+                state.moveSelection(index - state.getSelectedIndex(), filtered.size());
+                executeSelected();
+            });
+            results.addView(item, new LinearLayout.LayoutParams(-1, dp(48)));
+        }
+        refreshSelection();
+    }
+
+    private void refreshSelection() {
+        for (int i = 0; i < results.getChildCount(); i++) {
+            results.getChildAt(i).setBackground(i == state.getSelectedIndex() ? roundBackground(0x663B82F6, 10) : null);
+        }
+        if (state.getSelectedIndex() < results.getChildCount()) {
+            results.getChildAt(state.getSelectedIndex()).requestFocusFromTouch();
+            resultsScroll.smoothScrollTo(0, state.getSelectedIndex() * dp(48));
+        }
+    }
+
+    private void executeSelected() {
+        if (filtered.isEmpty()) return;
+        int index = Math.max(0, Math.min(state.getSelectedIndex(), filtered.size() - 1));
+        if (actionAdapter.execute(filtered.get(index))) dismiss();
+    }
+
+    private GradientDrawable roundBackground(int color, int radiusDp) {
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(color);
+        background.setCornerRadius(dp(radiusDp));
+        return background;
+    }
+
+    private int dp(int value) {
+        return Math.round(value * getContext().getResources().getDisplayMetrics().density);
+    }
+}
