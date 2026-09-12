@@ -1,6 +1,6 @@
 # OMEGA Design System v1
 
-**Status:** Implemented baseline
+**Status:** Implemented baseline  
 **Scope:** Android app visual foundations for the OMEGA fork
 
 ## Principles
@@ -29,16 +29,24 @@
 
 ### Spacing and Shape
 
-The initial spacing scale is 4/8/12/16/24/32dp. Shared touch targets use 48dp. Shape tokens provide small, medium and large corner radii.
+The initial spacing scale is 4/8/12/16/24/32dp. Shared touch targets use 48dp. Shape tokens provide small, medium and large corner radii; the terminal toolbar uses a shared 40dp height token.
 
 ## Current Integration
 
-`colors.xml`, `dimens.xml`, `themes.xml` and `styles.xml` now provide the first reusable OMEGA layer. The main terminal theme maps primary, background, drawer, extra-key and accent values to semantic tokens.
+`colors.xml`, `dimens.xml`, `themes.xml` and `styles.xml` provide the reusable OMEGA layer. The main terminal surface now consumes semantic background and toolbar tokens, while drawer controls use shared spacing and touch-target resources.
+
+## Interface References
+
+P1 design references are maintained under `docs/interfaces/`. They document session drawer, toolbar, keyboard/inset and extra-key states without pretending to be screenshots of an unverified runtime build.
 
 ## Compatibility
 
 The design layer does not replace the existing terminal renderer, command services or plugin interfaces. Existing black/white/red/grey compatibility resources remain available while OMEGA components migrate to semantic tokens.
 
+## Verification
+
+The P1 test matrix is maintained in `docs/OMEGA-P1-TEST-MATRIX.md`. CI/device validation is required before claiming runtime screenshot parity or release readiness.
+
 ## Next Step
 
-Phase P1 is Terminal UX: apply the shared tokens to session controls, terminal toolbar, keyboard/extra keys, dialogs and settings surfaces, followed by visual regression and accessibility checks.
+Complete P1 Terminal UX: session-row redesign, extra-key profiles, contextual actions and centralized modern window-insets handling, followed by instrumented UI tests and real-device PNG screenshot capture.
