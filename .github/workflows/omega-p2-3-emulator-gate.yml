@@ -5,6 +5,10 @@ on: [push, workflow_dispatch]
 permissions:
   contents: read
 
+concurrency:
+  group: omega-p2-3-emulator-gate-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   emulator-gate:
     name: P2.3 Android Emulator Gate
