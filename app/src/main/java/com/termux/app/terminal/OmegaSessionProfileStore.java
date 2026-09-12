@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 /** Small persistence boundary for optional OMEGA session profiles. */
@@ -31,7 +33,7 @@ public final class OmegaSessionProfileStore {
 
     @NonNull
     public OmegaSessionProfile load(@NonNull String profileId) {
-        if (!contains(profileId)) return OmegaSessionProfile.omegaDefault();
+        if (!contains(profileId)) return defaultForId(profileId);
         return new OmegaSessionProfile(
             profileId,
             preferences.getString(key(profileId, "name"), profileId),
@@ -41,6 +43,22 @@ public final class OmegaSessionProfileStore {
             preferences.getInt(key(profileId, "scrollback"), OmegaSessionProfile.DEFAULT_SCROLLBACK),
             preferences.getBoolean(key(profileId, "keep_screen_on"), false)
         );
+    }
+
+    @NonNull
+    public String exportAll() {
+        ArrayList<OmegaSessionProfile> profiles = new ArrayList<>();
+        for (String id : profileIds()) profiles.add(load(id));
+        Collections.sort(profiles, java.util.Comparator.comparing(OmegaSessionProfile::getId));
+        return OmegaSessionProfileCodec.exportProfiles(profiles);
+    }
+
+    public void importAll(@NonNull String json, boolean replaceExisting) {
+        java.util.List<OmegaSessionProfile> profiles = OmegaSessionProfileCodec.importProfiles(json);
+        if (replaceExisting) {
+            for (String id : profileIds()) delete(id);
+        }
+        for (OmegaSessionProfile profile : profiles) save(profile);
     }
 
     public boolean contains(@NonNull String profileId) {
@@ -61,14 +79,28 @@ public final class OmegaSessionProfileStore {
     @NonNull
     public String[] profileIds() {
         String prefix = KEY_PREFIX;
-        java.util.ArrayList<String> ids = new java.util.ArrayList<>();
+        ArrayList<String> ids = new ArrayList<>();
         for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
-            String key = entry.getKey();
-            if (!key.startsWith(prefix) || !key.endsWith("_name")) continue;
-            String id = key.substring(prefix.length(), key.length() - "_name".length());
+            String preferenceKey = entry.getKey();
+            if (!preferenceKey.startsWith(prefix) || !preferenceKey.endsWith("_name")) continue;
+            String id = preferenceKey.substring(prefix.length(), preferenceKey.length() - "_name".length());
             if (!id.isEmpty()) ids.add(id);
         }
+        Collections.sort(ids);
         return ids.toArray(new String[0]);
+    }
+
+    @NonNull
+    private static OmegaSessionProfile defaultForId(@NonNull String profileId) {
+        if (profileId.trim().isEmpty()) throw new IllegalArgumentException("Profile id must not be empty");
+        return new OmegaSessionProfile(
+            profileId,
+            profileId,
+            OmegaSessionProfile.DEFAULT_FONT_SIZE,
+            "omega-dark",
+            "block",
+            OmegaSessionProfile.DEFAULT_SCROLLBACK,
+            false);
     }
 
     private static String key(@NonNull String profileId, @NonNull String field) {
