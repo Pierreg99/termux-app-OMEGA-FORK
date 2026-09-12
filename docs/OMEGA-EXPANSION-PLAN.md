@@ -21,34 +21,39 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 - [x] Move terminal toolbar background to an OMEGA semantic surface token.
 - [x] Redesign session rows with explicit ACTIVE/BACKGROUND/EXITED states.
 - [x] Add accessible session-state text and content descriptions.
-- [x] Apply OMEGA semantic visual policy to extra keys.
+- [x] Apply OMEGA semantic visual policy to extra keys where supported by the existing API surface.
 - [x] Preserve existing `termux.properties` extra-key configuration.
 - [x] Centralize bottom IME/system-bar inset resolution.
 - [x] Keep inset handling outside terminal rendering through a transparent spacer.
 - [x] Add P1 UI/resource tests with Robolectric.
 - [x] Add P1 test matrix, changelog and interface references.
 
-## Phase 3 — OMEGA Command Center — ACTIVE
+## Phase 3 — OMEGA Command Center — P2.1/P2.2 COMPLETE, P2.3 VALIDATION ACTIVE
 
 - [x] Define Command Center architecture and command categories.
-- [ ] Add immutable command identifiers and registry.
-- [ ] Add enabled/disabled command state resolution.
-- [ ] Add searchable command palette.
-- [ ] Add keyboard-first navigation and accessibility focus handling.
-- [ ] Connect session actions to existing Termux session APIs.
-- [ ] Connect terminal actions to existing activity APIs.
-- [ ] Add command-registry and UI tests.
-- [ ] Capture real-device screenshot evidence.
+- [x] Add immutable command identifiers and registry.
+- [x] Add session-aware command availability and selector generation.
+- [x] Add searchable command palette.
+- [x] Add keyboard-first navigation and accessibility focus handling.
+- [x] Connect session actions to existing Termux session APIs.
+- [x] Connect terminal actions to existing activity APIs.
+- [x] Add command-registry and UI tests.
+- [ ] Execute Android emulator/device screenshot and accessibility evidence gate.
+- [ ] Complete hardware-keyboard smoke validation.
 
 **P2 specification:** `docs/OMEGA-COMMAND-CENTER-P2.md`
 
-## Phase 4 — Power-User Features
+## Phase 4 — Power-User Features — P3 READY
 
 - [ ] Per-session profiles.
 - [ ] Theme/profile presets with import/export.
 - [ ] Font, cursor, scrollback, opacity/transparency and extra-key controls.
 - [ ] Optional session restore under explicit user control.
+- [ ] Command favorites/pinning and user-defined ordering.
+- [ ] Configurable command shortcuts without changing existing Termux defaults.
 - [ ] Preserve existing Termux plugin integration points.
+
+**P3 specification:** `docs/OMEGA-POWER-USER-P3.md`
 
 ## Phase 5 — Performance & Reliability
 
@@ -78,4 +83,4 @@ Evolve the fork into a clearly differentiated, production-oriented OMEGA experie
 
 ## Tracking
 
-**Current state:** P0 and P1 are complete at source/documentation level. P2 OMEGA Command Center is active. Runtime/device verification remains a release gate until a real Android build and test run are available.
+**Current state:** P0 and P1 are complete at source/documentation level. P2.1 and P2.2 are implemented. P2.3 runtime validation is active with GitHub Actions emulator coverage, but real accessibility/hardware-keyboard evidence remains a release gate. P3 architecture is now ready for implementation without blocking the P2.3 evidence lane.
